@@ -173,7 +173,7 @@ public class ThisCard : MonoBehaviour
         //Upgrade Card Instantiation
         if (this.tag == "Clone" && PlayerDeck.drawType == "Upgrade")
         {
-            thisCard[0] = new Card(38, "Upgrade Card", 1, "None", Resources.Load<Sprite>("7"), "Red");
+            thisCard[0] = new Card(38, "Upgrade Card", 1, "None", Resources.Load<Sprite>("7"), 38);
             thisSprite = thisCard[0].logo;
             id = thisCard[0].id;
             tier = thisCard[0].tier;
@@ -282,6 +282,106 @@ public class ThisCard : MonoBehaviour
             stackZone3 = GameObject.Find("CN4");
             stackZone4 = GameObject.Find("IT4");
             stackZone5 = GameObject.Find("VC4");
+        }
+
+        if(stackZone.transform.childCount == 0)
+        {
+            if (TurnSystem.isPlayer1Turn)
+            {
+                GameObject.Find("PM1 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer2Turn)
+            {
+                GameObject.Find("PM2 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer3Turn)
+            {
+                GameObject.Find("PM3 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer4Turn)
+            {
+                GameObject.Find("PM4 Title").GetComponent<Text>().text = "";
+            }
+        }
+
+        if (stackZone2.transform.childCount == 0)
+        {
+            if (TurnSystem.isPlayer1Turn)
+            {
+                GameObject.Find("CR1 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer2Turn)
+            {
+                GameObject.Find("CR2 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer3Turn)
+            {
+                GameObject.Find("CR3 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer4Turn)
+            {
+                GameObject.Find("CR4 Title").GetComponent<Text>().text = "";
+            }
+        }
+
+        if (stackZone3.transform.childCount == 0)
+        {
+            if (TurnSystem.isPlayer1Turn)
+            {
+                GameObject.Find("CN1 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer2Turn)
+            {
+                GameObject.Find("CN2 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer3Turn)
+            {
+                GameObject.Find("CN3 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer4Turn)
+            {
+                GameObject.Find("CN4 Title").GetComponent<Text>().text = "";
+            }
+        }
+
+        if (stackZone4.transform.childCount == 0)
+        {
+            if (TurnSystem.isPlayer1Turn)
+            {
+                GameObject.Find("IT1 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer2Turn)
+            {
+                GameObject.Find("IT2 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer3Turn)
+            {
+                GameObject.Find("IT3 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer4Turn)
+            {
+                GameObject.Find("IT4 Title").GetComponent<Text>().text = "";
+            }
+        }
+
+        if (stackZone5.transform.childCount == 0)
+        {
+            if (TurnSystem.isPlayer1Turn)
+            {
+                GameObject.Find("VC1 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer2Turn)
+            {
+                GameObject.Find("VC2 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer3Turn)
+            {
+                GameObject.Find("VC3 Title").GetComponent<Text>().text = "";
+            }
+            if (TurnSystem.isPlayer4Turn)
+            {
+                GameObject.Find("VC4 Title").GetComponent<Text>().text = "";
+            }
         }
 
         //Conditions for adding and Removing Cards
@@ -623,7 +723,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("PM1 Title").GetComponent<Text>().text = "PM Tier 1";
+                    GameObject.Find("PM1 Title").GetComponent<Text>().text = "PM Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p1score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p1score += 2;
+                    }
                     PlayerDeck.player1StackCards.Add(thisCard[0]);
                     PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
@@ -709,7 +817,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("PM2 Title").GetComponent<Text>().text = "PM Tier 1";
+                    GameObject.Find("PM2 Title").GetComponent<Text>().text = "PM Tier " + tier;
+                    if(tier == 2)
+                    {
+                        PlayerDeck.p2score += 1;
+                    }
+                    else if(tier == 3)
+                    {
+                        PlayerDeck.p2score += 2;
+                    }
                     PlayerDeck.player2StackCards.Add(thisCard[0]);
                     PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
@@ -796,7 +912,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("PM3 Title").GetComponent<Text>().text = "PM Tier 1";
+                    GameObject.Find("PM3 Title").GetComponent<Text>().text = "PM Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p3score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p3score += 2;
+                    }
                     PlayerDeck.player3StackCards.Add(thisCard[0]);
                     PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
@@ -871,7 +995,7 @@ public class ThisCard : MonoBehaviour
                             stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
                         }
                         stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier 4";
+                        GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier 3";
                         Destroy(gameObject);
                         PlayerDeck.p4score++;
                     }
@@ -883,7 +1007,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier 1";
+                    GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p4score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p4score += 2;
+                    }
                     PlayerDeck.player4StackCards.Add(thisCard[0]);
                     PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
@@ -972,7 +1104,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CR1 Title").GetComponent<Text>().text = "CR Tier 1";
+                    GameObject.Find("CR1 Title").GetComponent<Text>().text = "CR Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p1score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p1score += 2;
+                    }
                     PlayerDeck.player1StackCards.Add(thisCard[0]);
                     PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
@@ -1059,7 +1199,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CR2 Title").GetComponent<Text>().text = "CR Tier 1";
+                    GameObject.Find("CR2 Title").GetComponent<Text>().text = "CR Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p2score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p2score += 2;
+                    }
                     PlayerDeck.player2StackCards.Add(thisCard[0]);
                     PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
@@ -1145,7 +1293,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CR3 Title").GetComponent<Text>().text = "CR Tier 1";
+                    GameObject.Find("CR3 Title").GetComponent<Text>().text = "CR Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p3score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p3score += 2;
+                    }
                     PlayerDeck.player3StackCards.Add(thisCard[0]);
                     PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
@@ -1231,7 +1387,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CR4 Title").GetComponent<Text>().text = "CR Tier 1";
+                    GameObject.Find("CR4 Title").GetComponent<Text>().text = "CR Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p4score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p4score += 2;
+                    }
                     PlayerDeck.player4StackCards.Add(thisCard[0]);
                     PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
@@ -1320,7 +1484,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CN1 Title").GetComponent<Text>().text = "CI Tier 1";
+                    GameObject.Find("CN1 Title").GetComponent<Text>().text = "CI Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p1score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p1score += 2;
+                    }
                     PlayerDeck.player1StackCards.Add(thisCard[0]);
                     PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
@@ -1401,7 +1573,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CN2 Title").GetComponent<Text>().text = "CI Tier 1";
+                    GameObject.Find("CN2 Title").GetComponent<Text>().text = "CI Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p2score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p2score += 2;
+                    }
                     PlayerDeck.player2StackCards.Add(thisCard[0]);
                     PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
@@ -1481,7 +1661,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CN3 Title").GetComponent<Text>().text = "CI Tier 1";
+                    GameObject.Find("CN3 Title").GetComponent<Text>().text = "CI Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p3score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p3score += 2;
+                    }
                     PlayerDeck.player3StackCards.Add(thisCard[0]);
                     PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
@@ -1561,7 +1749,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("CN4 Title").GetComponent<Text>().text = "CI Tier 1";
+                    GameObject.Find("CN4 Title").GetComponent<Text>().text = "CI Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p4score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p4score += 2;
+                    }
                     PlayerDeck.player4StackCards.Add(thisCard[0]);
                     PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
@@ -1638,7 +1834,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("IT1 Title").GetComponent<Text>().text = "IT Tier 1";
+                    GameObject.Find("IT1 Title").GetComponent<Text>().text = "IT Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p1score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p1score += 2;
+                    }
                     PlayerDeck.player1StackCards.Add(thisCard[0]);
                     PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
@@ -1713,7 +1917,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("IT2 Title").GetComponent<Text>().text = "IT Tier 1";
+                    GameObject.Find("IT2 Title").GetComponent<Text>().text = "IT Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p2score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p2score += 2;
+                    }
                     PlayerDeck.player2StackCards.Add(thisCard[0]);
                     PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
@@ -1788,7 +2000,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("IT3 Title").GetComponent<Text>().text = "IT Tier 1";
+                    GameObject.Find("IT3 Title").GetComponent<Text>().text = "IT Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p3score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p3score += 2;
+                    }
                     PlayerDeck.player3StackCards.Add(thisCard[0]);
                     PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
@@ -1863,7 +2083,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("IT4 Title").GetComponent<Text>().text = "IT Tier 1";
+                    GameObject.Find("IT4 Title").GetComponent<Text>().text = "IT Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p4score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p4score += 2;
+                    }
                     PlayerDeck.player4StackCards.Add(thisCard[0]);
                     PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
@@ -1940,7 +2168,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("VC1 Title").GetComponent<Text>().text = "VC Tier 1";
+                    GameObject.Find("VC1 Title").GetComponent<Text>().text = "VC Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p1score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p1score += 2;
+                    }
                     PlayerDeck.player1StackCards.Add(thisCard[0]);
                     PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
@@ -2015,7 +2251,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("VC2 Title").GetComponent<Text>().text = "VC Tier 1";
+                    GameObject.Find("VC2 Title").GetComponent<Text>().text = "VC Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p2score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p2score += 2;
+                    }
                     PlayerDeck.player2StackCards.Add(thisCard[0]);
                     PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
@@ -2091,7 +2335,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("VC3 Title").GetComponent<Text>().text = "VC Tier 1";
+                    GameObject.Find("VC3 Title").GetComponent<Text>().text = "VC Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p3score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p3score += 2;
+                    }
                     PlayerDeck.player3StackCards.Add(thisCard[0]);
                     PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
@@ -2167,7 +2419,15 @@ public class ThisCard : MonoBehaviour
                 }
                 else
                 {
-                    GameObject.Find("VC4 Title").GetComponent<Text>().text = "VC Tier 1";
+                    GameObject.Find("VC4 Title").GetComponent<Text>().text = "VC Tier " + tier;
+                    if (tier == 2)
+                    {
+                        PlayerDeck.p4score += 1;
+                    }
+                    else if (tier == 3)
+                    {
+                        PlayerDeck.p4score += 2;
+                    }
                     PlayerDeck.player4StackCards.Add(thisCard[0]);
                     PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }

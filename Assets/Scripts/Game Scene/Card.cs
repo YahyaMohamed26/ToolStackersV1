@@ -14,21 +14,21 @@ public class Card
     public string owner;
 
     public Sprite logo;
-    public string color;
+    public int index;
 
     public Card()
     {
 
     }
 
-    public Card (int _id, string _cardName, int _tier, string _cardDescription, Sprite _logo, string _color)
+    public Card (int _id, string _cardName, int _tier, string _cardDescription, Sprite _logo, int _index)
     {
         id = _id;
         cardName = _cardName;
         tier = _tier;
         cardDescription = _cardDescription;
         logo = _logo;
-        color = _color;
+        index = _index;
     }
 
 }

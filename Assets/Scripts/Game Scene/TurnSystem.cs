@@ -20,6 +20,7 @@ public class TurnSystem : MonoBehaviourPun
     public GameObject Player4Name;
 
     public GameObject turnPanel;
+    public Text turnText;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +30,7 @@ public class TurnSystem : MonoBehaviourPun
         Player3Name = GameObject.Find("Player 3 Name Block");
         Player4Name = GameObject.Find("Player 4 Name Block");
         Player1Name.GetComponent<Image>().color = Color.yellow;
+        turnText.text = "Your turn";
     }
 
     public void leave()
@@ -42,29 +44,35 @@ public class TurnSystem : MonoBehaviourPun
         if (isPlayer1Turn)
         {
             Player1Name.GetComponent<Image>().color = Color.yellow;
+            turnText.text = "Your turn";
             Player2Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player3Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player4Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
+
             turnPanel.SetActive(false);
-        }   
+
+        }
         else if (isPlayer2Turn)
         {
+            turnText.text = GameObject.Find("Player 2 Name").GetComponent<Text>().text + "'s turn";
             Player1Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player3Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player4Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player2Name.GetComponent<Image>().color = Color.yellow;
             turnPanel.SetActive(true);
-        }   
+        }
         else if (isPlayer3Turn)
         {
+            turnText.text = GameObject.Find("Player 3 Name").GetComponent<Text>().text + "'s turn";
             Player1Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player2Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player4Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player3Name.GetComponent<Image>().color = Color.yellow;
             turnPanel.SetActive(true);
-        }   
-        else if(isPlayer4Turn)
+        }
+        else if (isPlayer4Turn)
         {
+            turnText.text = GameObject.Find("Player 4 Name").GetComponent<Text>().text + "'s turn";
             Player1Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player2Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player3Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);

@@ -13,6 +13,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     GameObject placeholder = null;
 
     private bool isDragging;
+    public string originalParent;
 
     private bool CanPickUp()
     {
@@ -41,6 +42,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     {
         if (CanPickUp())
         {
+            originalParent = transform.gameObject.GetComponent<ThisCard>().owner;
             Debug.Log("OnBeginDrag");
             isDragging = true;
             placeholder = new GameObject();
@@ -97,10 +99,10 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
     {
         if (CanPickUp())
         {
-            string old = gameObject.transform.parent.name;
-            if (old == "Hand" || old == "Hand2" || old == "Hand3" || old == "Hand4")
+            
+            if (originalParent == "Discarded1" || originalParent == "Discarded2" || originalParent == "Discarded3" || originalParent == "Discarded4")
             {
-                old = "Hand";
+                originalParent = "Discarded";
             }
             if (TurnSystem.isPlayer1Turn && PlayerDeck.hasDiscardedCard && GameObject.Find("Discarded Player 1").transform.childCount > 1)
             {
@@ -163,7 +165,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
                     mainPlayer.DropCard("Discarded Player", GetComponent<ThisCard>().cardIndex, GetComponent<ThisCard>().cardType);
                     break;
                 case "Hand":
-                    mainPlayer.DropCard("Hand", GetComponent<ThisCard>().cardIndex, GetComponent<ThisCard>().cardType, old);
+                    mainPlayer.DropCard("Hand", GetComponent<ThisCard>().cardIndex, GetComponent<ThisCard>().cardType, originalParent);
                     break;
             }
 

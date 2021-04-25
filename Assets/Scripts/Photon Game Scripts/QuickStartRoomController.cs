@@ -43,12 +43,9 @@ public class QuickStartRoomController : MonoBehaviourPunCallbacks
         }
     }
 
-     public override void OnJoinedRoom()
+    private void Update()
     {
-        roomPanel.SetActive(true);
-        lobbyPanel.SetActive(false);
-        roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name;
-        if (PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount == 4)
         {
             startButton.SetActive(true);
         }
@@ -56,6 +53,14 @@ public class QuickStartRoomController : MonoBehaviourPunCallbacks
         {
             startButton.SetActive(false);
         }
+    }
+
+    public override void OnJoinedRoom()
+    {
+        roomPanel.SetActive(true);
+        lobbyPanel.SetActive(false);
+        roomNameDisplay.text = PhotonNetwork.CurrentRoom.Name;
+        
 
         ClearPlayerListings();
         ListPlayers();

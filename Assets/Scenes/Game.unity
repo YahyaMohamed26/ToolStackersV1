@@ -155,10 +155,10 @@ RectTransform:
   m_Father: {fileID: 1082989542}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 238, y: -460.25}
-  m_SizeDelta: {x: -1761.1927, y: -920.50586}
+  m_SizeDelta: {x: 158.80725, y: 159.49414}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3177260
 MonoBehaviour:
@@ -506,7 +506,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 54
+  m_RootOrder: 53
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -814,7 +814,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 55
+  m_RootOrder: 54
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -892,7 +892,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 65
+  m_RootOrder: 64
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1048,7 +1048,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 56
+  m_RootOrder: 55
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1126,7 +1126,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 49
+  m_RootOrder: 48
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1504,7 +1504,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 50
+  m_RootOrder: 49
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1648,7 +1648,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 57
+  m_RootOrder: 56
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1696,6 +1696,84 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 248521257}
   m_CullTransparentMesh: 0
+--- !u!1 &267021724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 267021727}
+  - component: {fileID: 267021726}
+  - component: {fileID: 267021725}
+  m_Layer: 5
+  m_Name: CardCount
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &267021725
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267021724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 40
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 50
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: 0
+--- !u!222 &267021726
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267021724}
+  m_CullTransparentMesh: 0
+--- !u!224 &267021727
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 267021724}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 330231384}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0.000042677, y: -33}
+  m_SizeDelta: {x: 557.6026, y: 99.999985}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &313752851
 GameObject:
   m_ObjectHideFlags: 0
@@ -1795,6 +1873,82 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 313752851}
+  m_CullTransparentMesh: 0
+--- !u!1 &330231383
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 330231384}
+  - component: {fileID: 330231386}
+  - component: {fileID: 330231385}
+  m_Layer: 5
+  m_Name: Panel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &330231384
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330231383}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 981231921}
+  - {fileID: 267021727}
+  m_Father: {fileID: 1082989542}
+  m_RootOrder: 68
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -190, y: -25}
+  m_SizeDelta: {x: 600, y: 166}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &330231385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330231383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  m_Type: 1
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &330231386
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330231383}
   m_CullTransparentMesh: 0
 --- !u!1 &335733005
 GameObject:
@@ -2215,7 +2369,6 @@ GameObject:
   - component: {fileID: 439393132}
   - component: {fileID: 439393131}
   - component: {fileID: 439393130}
-  - component: {fileID: 439393129}
   m_Layer: 5
   m_Name: Discarded Player 4
   m_TagString: Zone 2
@@ -2237,23 +2390,11 @@ RectTransform:
   m_Father: {fileID: 1082989542}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -884.5, y: -251}
-  m_SizeDelta: {x: -1774.3094, y: -930.42566}
+  m_SizeDelta: {x: 145.69055, y: 149.57434}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &439393129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 439393127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 672fc4aad49a38b4e9704b3a06b324ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &439393130
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2346,7 +2487,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 58
+  m_RootOrder: 57
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -2619,7 +2760,6 @@ GameObject:
   - component: {fileID: 510738201}
   - component: {fileID: 510738200}
   - component: {fileID: 510738199}
-  - component: {fileID: 510738198}
   m_Layer: 5
   m_Name: Discarded Player 2
   m_TagString: Zone 2
@@ -2641,23 +2781,11 @@ RectTransform:
   m_Father: {fileID: 1082989542}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 517.1, y: 274}
-  m_SizeDelta: {x: -1773.2935, y: -921.747}
+  m_SizeDelta: {x: 146.70654, y: 158.25299}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &510738198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 510738196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 672fc4aad49a38b4e9704b3a06b324ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &510738199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3464,7 +3592,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 51
+  m_RootOrder: 50
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4145,7 +4273,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 59
+  m_RootOrder: 58
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4514,7 +4642,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 48
+  m_RootOrder: 47
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4592,7 +4720,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 66
+  m_RootOrder: 65
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4896,7 +5024,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 62
+  m_RootOrder: 61
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -4944,6 +5072,84 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 948657276}
   m_CullTransparentMesh: 0
+--- !u!1 &981231920
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 981231921}
+  - component: {fileID: 981231923}
+  - component: {fileID: 981231922}
+  m_Layer: 5
+  m_Name: Turn Text
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &981231921
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981231920}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 330231384}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0.000042677, y: 33}
+  m_SizeDelta: {x: 557.6026, y: 99.999985}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &981231922
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981231920}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 50
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 50
+    m_Alignment: 4
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Player 1's Turn
+--- !u!222 &981231923
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981231920}
+  m_CullTransparentMesh: 0
 --- !u!1 &982643846
 GameObject:
   m_ObjectHideFlags: 0
@@ -4978,10 +5184,10 @@ RectTransform:
   m_Father: {fileID: 1082989542}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 777.80054, y: -1}
-  m_SizeDelta: {x: -1552.8435, y: 1.9998779}
+  m_SizeDelta: {x: 367.1565, y: 1081.9999}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &982643848
 MonoBehaviour:
@@ -5539,7 +5745,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 2
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
@@ -5624,7 +5830,6 @@ RectTransform:
   - {fileID: 52906165}
   - {fileID: 5075586809140832862}
   - {fileID: 1798865624}
-  - {fileID: 1241898867}
   - {fileID: 904655410}
   - {fileID: 123929168}
   - {fileID: 226694865}
@@ -5645,6 +5850,8 @@ RectTransform:
   - {fileID: 102213744}
   - {fileID: 907498593}
   - {fileID: 1766630607}
+  - {fileID: 1241898867}
+  - {fileID: 330231384}
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5763,7 +5970,7 @@ RectTransform:
   - {fileID: 665282918}
   - {fileID: 995248252}
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 47
+  m_RootOrder: 67
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5837,7 +6044,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 64
+  m_RootOrder: 63
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -7090,7 +7297,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 67
+  m_RootOrder: 66
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -7150,7 +7357,6 @@ GameObject:
   - component: {fileID: 1770886232}
   - component: {fileID: 1770886231}
   - component: {fileID: 1770886230}
-  - component: {fileID: 1770886229}
   m_Layer: 5
   m_Name: Discarded Player 3
   m_TagString: Zone 2
@@ -7172,23 +7378,11 @@ RectTransform:
   m_Father: {fileID: 1082989542}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -604, y: 468.9}
-  m_SizeDelta: {x: -1788.3854, y: -935.7947}
+  m_SizeDelta: {x: 131.61462, y: 144.20532}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1770886229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770886227}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 672fc4aad49a38b4e9704b3a06b324ce, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1770886230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7474,10 +7668,10 @@ RectTransform:
   m_Father: {fileID: 1082989542}
   m_RootOrder: 46
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 777.11, y: 269}
-  m_SizeDelta: {x: -1554.2223, y: -538}
+  m_SizeDelta: {x: 365.7777, y: 542}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1798865625
 MonoBehaviour:
@@ -8436,7 +8630,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 63
+  m_RootOrder: 62
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -8694,7 +8888,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 60
+  m_RootOrder: 59
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -8924,7 +9118,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 53
+  m_RootOrder: 52
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -9080,7 +9274,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 61
+  m_RootOrder: 60
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -9158,7 +9352,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1082989542}
-  m_RootOrder: 52
+  m_RootOrder: 51
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -9225,6 +9419,7 @@ MonoBehaviour:
   Player3Name: {fileID: 0}
   Player4Name: {fileID: 0}
   turnPanel: {fileID: 1798865623}
+  turnText: {fileID: 981231922}
 --- !u!114 &3049758052272074377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9244,280 +9439,308 @@ MonoBehaviour:
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
+  - id: 0
+    cardName: 
+    tier: 0
+    cardDescription: 
+    owner: 
+    logo: {fileID: 0}
+    index: 0
+  - id: 0
+    cardName: 
+    tier: 0
+    cardDescription: 
+    owner: 
+    logo: {fileID: 0}
+    index: 0
+  - id: 0
+    cardName: 
+    tier: 0
+    cardDescription: 
+    owner: 
+    logo: {fileID: 0}
+    index: 0
+  - id: 0
+    cardName: 
+    tier: 0
+    cardDescription: 
+    owner: 
+    logo: {fileID: 0}
+    index: 0
   eventDeck:
   - id: 0
     cardName: 
@@ -9525,280 +9748,224 @@ MonoBehaviour:
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   - id: 0
     cardName: 
     tier: 0
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
-  - id: 0
-    cardName: 
-    tier: 0
-    cardDescription: 
-    owner: 
-    logo: {fileID: 0}
-    color: 
+    index: 0
   container:
   - id: 0
     cardName: 
@@ -9806,7 +9973,7 @@ MonoBehaviour:
     cardDescription: 
     owner: 
     logo: {fileID: 0}
-    color: 
+    index: 0
   player1Cardsp: []
   player2Cardsp: []
   player3Cardsp: []
@@ -9821,6 +9988,11 @@ MonoBehaviour:
   Hand2: {fileID: 1732665121}
   Hand3: {fileID: 46857407}
   Hand4: {fileID: 335733005}
+  PM: {fileID: 0}
+  VC: {fileID: 0}
+  IT: {fileID: 0}
+  CN: {fileID: 0}
+  CR: {fileID: 0}
   DrawButton: {fileID: 1848691106}
   DrawEventButton: {fileID: 550983444}
   PerformEventButton: {fileID: 52906164}
@@ -9829,13 +10001,33 @@ MonoBehaviour:
   player2Score: {fileID: 673451679}
   player3Score: {fileID: 364778130}
   player4Score: {fileID: 2121233633}
+  p1has1: 0
+  p1has2: 0
+  p1has3: 0
+  p1has4: 0
+  p1has5: 0
+  p2has1: 0
+  p2has2: 0
+  p2has3: 0
+  p2has4: 0
+  p2has5: 0
+  p3has1: 0
+  p3has2: 0
+  p3has3: 0
+  p3has4: 0
+  p3has5: 0
+  p4has1: 0
+  p4has2: 0
+  p4has3: 0
+  p4has4: 0
+  p4has5: 0
   endTurnButton: {fileID: 1518069996}
   dealCardCallCount: 0
-  cardNo: 0
   endPanel: {fileID: 1241898866}
   panelText: {fileID: 665282917}
   restartButton: {fileID: 0}
   exitButton: {fileID: 995248251}
+  cardCount: {fileID: 267021725}
 --- !u!1 &3049758052272074379
 GameObject:
   m_ObjectHideFlags: 0

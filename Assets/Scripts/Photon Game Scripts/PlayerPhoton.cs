@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using Photon;
 using Photon.Pun;
 using UnityEngine.UI;
 
-public class PlayerPhoton : MonoBehaviourPun
+public class PlayerPhoton : MonoBehaviourPun, IPunObservable
 {
     public GameObject Hand, Hand2, Hand3, Hand4;
 
@@ -33,6 +34,7 @@ public class PlayerPhoton : MonoBehaviourPun
                 GameObject.Find("Character 1").GetComponent<Image>().sprite = Resources.Load<Sprite>("Ch 4");
             }
         }
+        DontDestroyOnLoad(gameObject);
     }
 
     [PunRPC]
@@ -215,15 +217,15 @@ public class PlayerPhoton : MonoBehaviourPun
                 parentName = parentType + " 1";
                 cardName = "Player 1 " + cardType + " Card " + cardIndex.ToString();
             }
-            else if (parentType == "Hand" && old != "Hand")
-            {
-                parentName = parentType;
-                cardName = "Player 4 " + cardType + " Card " + cardIndex.ToString();
-            }
-            else if (parentType == "Hand" && old == "Hand")
+            else if (parentType == "Hand" && old != "Discarded")
             {
                 parentName = parentType;
                 cardName = "Player 1 " + cardType + " Card " + cardIndex.ToString();
+            }
+            else if(parentType == "Hand" && old == "Discarded")
+            {
+                parentName = parentType;
+                cardName = "Player 4 " + cardType + " Card " + cardIndex.ToString();
             }
             else
             {
@@ -239,15 +241,15 @@ public class PlayerPhoton : MonoBehaviourPun
                 parentName = parentType + " 2";
                 cardName = "Player 2 " + cardType + " Card " + cardIndex.ToString();
             }
-            else if (parentType == "Hand" && old != "Hand")
-            {
-                parentName = parentType + "2";
-                cardName = "Player 1 " + cardType + " Card " + cardIndex.ToString();
-            }
-            else if (parentType == "Hand" && old == "Hand")
+            else if (parentType == "Hand" && old != "Discarded")
             {
                 parentName = parentType + "2";
                 cardName = "Player 2 " + cardType + " Card " + cardIndex.ToString();
+            }
+            else if (parentType == "Hand" && old == "Discarded")
+            {
+                parentName = parentType + "2";
+                cardName = "Player 1 " + cardType + " Card " + cardIndex.ToString();
             }
             else
             {
@@ -263,15 +265,15 @@ public class PlayerPhoton : MonoBehaviourPun
                 parentName = parentType + " 3";
                 cardName = "Player 3 " + cardType + " Card " + cardIndex.ToString();
             }
-            else if (parentType == "Hand" && old != "Hand")
-            {
-                parentName = parentType + "3";
-                cardName = "Player 2 " + cardType + " Card " + cardIndex.ToString();
-            }
-            else if (parentType == "Hand" && old == "Hand")
+            else if (parentType == "Hand" && old != "Discarded")
             {
                 parentName = parentType + "3";
                 cardName = "Player 3 " + cardType + " Card " + cardIndex.ToString();
+            }
+            else if (parentType == "Hand" && old == "Discarded")
+            {
+                parentName = parentType + "3";
+                cardName = "Player 2 " + cardType + " Card " + cardIndex.ToString();
             }
             else
             {
@@ -286,15 +288,15 @@ public class PlayerPhoton : MonoBehaviourPun
                 parentName = parentType + " 4";
                 cardName = "Player 4 " + cardType + " Card " + cardIndex.ToString();
             }
-            else if (parentType == "Hand" && old != "Hand")
-            {
-                parentName = parentType + "4";
-                cardName = "Player 3 " + cardType + " Card " + cardIndex.ToString();
-            }
-            else if (parentType == "Hand" && old == "Hand")
+            else if (parentType == "Hand" && old != "Discarded")
             {
                 parentName = parentType + "4";
                 cardName = "Player 4 " + cardType + " Card " + cardIndex.ToString();
+            }
+            else if (parentType == "Hand" && old == "Discarded")
+            {
+                parentName = parentType + "4";
+                cardName = "Player 3 " + cardType + " Card " + cardIndex.ToString();
             }
             else
             {
@@ -349,6 +351,23 @@ public class PlayerPhoton : MonoBehaviourPun
         {
             card.SetParent(parent);
             card.rotation = parent.rotation;
+        }
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            if (TurnSystem.isPlayer1Turn)
+            {
+                stream.SendNext(PlayerDeck.cardNo);
+                Debug.Log("Sending");
+            }
+        }
+        else
+        {
+            PlayerDeck.cardNo = (int)stream.ReceiveNext();
+            Debug.Log("Receiving");
         }
     }
 }
