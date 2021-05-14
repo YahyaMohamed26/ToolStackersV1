@@ -27,7 +27,15 @@ public class UIOnHoverEvent : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         zoomCard.transform.SetParent(canvas.transform, true);
 
         RectTransform rect = zoomCard.GetComponent<RectTransform>();
-        rect.sizeDelta = new Vector2(240, 308);
+        if(Screen.height == 1080 && Screen.width == 1920)
+        {
+            rect.sizeDelta = viewer.GetComponent<RectTransform>().sizeDelta;
+        }
+        else
+        {
+            rect.sizeDelta = new Vector2(240, 308);
+        }
+        
 
         //transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
         //transform.position = new Vector3(cachedPosition.x, cachedPosition.y + 10f, cachedPosition.z);

@@ -8,7 +8,19 @@ public class PlayerDeck : MonoBehaviour
 {
     public List<Card> deck = new List<Card>();
     public List<Card> eventDeck = new List<Card>();
+    public List<Card> upgradeDeck = new List<Card>();
     public List<Card> container = new List<Card>();
+    public List<QuestionsAndAnswers> qnA;
+    public static List<QuestionsAndAnswers> qnAs;
+    public GameObject[] options;
+    public static int currentQuestion;
+    public static bool isCorrect;
+    public Text questionText;
+    public GameObject quizPanel;
+
+    public static bool canCall;
+    public static bool canCall2;
+    public static bool isPerform;
 
     public static List<Card> player1Cards = new List<Card>();
     public static List<Card> player2Cards = new List<Card>();
@@ -30,11 +42,12 @@ public class PlayerDeck : MonoBehaviour
     public List<Card> player3StackCardsp = new List<Card>();
     public List<Card> player4StackCardsp = new List<Card>();
 
-    private int x;
     public static int deckSize;
     public static int eventDeckSize;
+    public static int upgradeDeckSize;
     public static List<Card> staticDeck = new List<Card>();
     public static List<Card> staticEventDeck = new List<Card>();
+    public static List<Card> staticUpgradeDeck = new List<Card>();
 
     public GameObject CardToHand;
     public GameObject Hand;
@@ -48,7 +61,10 @@ public class PlayerDeck : MonoBehaviour
     public GameObject CR;
     public static bool hasDrewCard;
     public static bool hasDiscardedCard;
+    public static bool hasDiscardedCard2;
     public static bool hasDealtCards;
+    public static bool hasClicked;
+    public static bool hasClicked2;
     public GameObject DrawButton;
     public GameObject DrawEventButton;
     public GameObject PerformEventButton;
@@ -89,21 +105,32 @@ public class PlayerDeck : MonoBehaviour
     public static GameObject panelTexts;
     public static GameObject restartButtons;
     public static GameObject exitButtons;
-    public Text cardCount;
 
+    public static Card eventCardPlayed;
+    public  Card eventCardPlayed2;
+
+    public static string pm1, pm2, pm3, pm4, cn1, cn2, cn3, cn4, cr1, cr2, cr3, cr4, vc1, vc2, vc3, vc4, it1, it2, it3, it4;
+    
     // Start is called before the first frame update
     void Start()
     {
-        cardNo = 1;
         p1score = 0;
         p2score = 0;
         p3score = 0;
         p4score = 0;
+        hasClicked = false;
+        isCorrect = false;
+        isPerform = false;
+        hasClicked2 = false;
+        canCall = false;
+        canCall2 = false;
+        qnAs = qnA;
         hasCompleteStackP1 = false;
         hasCompleteStackP2 = false;
         hasCompleteStackP3 = false;
         hasCompleteStackP4 = false;
         hasDiscardedCard = false;
+        hasDiscardedCard2 = false;
         hasDealtCards = false;
         hasDrewCard = false;
         eventCard = null;
@@ -116,35 +143,30 @@ public class PlayerDeck : MonoBehaviour
         panelTexts = panelText;
         endPanel.SetActive(false);
         endPanels.SetActive(false);
+        deckSize = 50;
+        eventDeckSize = 40;
+        upgradeDeckSize = 46;
 
-        x = 0;
-        cardCount.text = cardNo.ToString();
-        deckSize = 44;
-        eventDeckSize = 32;
-        
         if (PhotonNetwork.IsMasterClient)
         {
             Shuffle();
-            for (int i = 0; i < 44; i++)
+       
+            for (int i = 0; i < 50; i++)
             {
-                deck[i] = CardDatabase.cardsList[x];
-                GetComponent<PhotonView>().RPC("SyncDeck", RpcTarget.Others, i, deck[i].id);
-                x++;
-                if (x == 23)
-                {
-                   x = 0;
-                }
+                deck[i] = CardDatabase.cardsList[i];
+                GetComponent<PhotonView>().RPC("SyncDeck", RpcTarget.Others, i, deck[i].index, deck[i].cardNo);
             }
-            x = 23;
-            for (int i = 0; i < 39; i++)
+ 
+            for (int i = 0; i < 40; i++)
             {
-                eventDeck[i] = CardDatabase.cardsList[x];
-                GetComponent<PhotonView>().RPC("EventSyncDeck", RpcTarget.Others, i, eventDeck[i].id);
-                x++;
-                if (x == 39)
-                {
-                    x = 23;
-                }
+                eventDeck[i] = CardDatabase.cardsList[i + 50];
+                GetComponent<PhotonView>().RPC("EventSyncDeck", RpcTarget.Others, i, eventDeck[i].index, eventDeck[i].cardNo);
+            }
+
+            for (int i = 0; i < 46; i++)
+            {
+                upgradeDeck[i] = CardDatabase.cardsList[i + 90];
+                GetComponent<PhotonView>().RPC("UpgradeSyncDeck", RpcTarget.Others, i, upgradeDeck[i].index, upgradeDeck[i].cardNo);
             }
         }
         //Shuffle();
@@ -154,23 +176,41 @@ public class PlayerDeck : MonoBehaviour
     }
 
     [PunRPC]
-    private void SyncDeck(int deckIndex, int cardIndex)
+    private void SyncDeck(int deckIndex, int cardIndex, int cardValue)
     {
         deck[deckIndex] = CardDatabase.cardsList[cardIndex];
     }
 
     [PunRPC]
-    private void EventSyncDeck(int deckIndex, int cardIndex)
+    private void EventSyncDeck(int deckIndex, int cardIndex, int cardValue)
     {
         eventDeck[deckIndex] = CardDatabase.cardsList[cardIndex];
+    }
+
+    [PunRPC]
+    private void UpgradeSyncDeck(int deckIndex, int cardIndex, int cardValue)
+    {
+        upgradeDeck[deckIndex] = CardDatabase.cardsList[cardIndex];
     }
 
     // Update is called once per frame
     void Update()
     {
+        eventCardPlayed2 = eventCardPlayed;
+        if (canCall)
+        {
+            Answer();
+            canCall = false;
+        }
+
+        if (canCall2)
+        {
+            AnswerPerform();
+            canCall2 = false;
+        }
         staticDeck = deck;
         staticEventDeck = eventDeck;
-        cardCount.text = cardNo.ToString();
+        staticUpgradeDeck = upgradeDeck;
         player1Cardsp = player1Cards;
         player2Cardsp = player2Cards;
         player3Cardsp = player3Cards;
@@ -219,20 +259,32 @@ public class PlayerDeck : MonoBehaviour
             PerformEventButton.GetComponent<Button>().interactable = false;
         }
 
-        if ((hasDrewCard && !hasDiscardedCard) || !hasDealtCards)
+        if(staticDeck.Count <= 0)
+        {
+            DrawButton.GetComponent<Button>().interactable = false;
+        }
+
+        if ((hasDrewCard && !hasDiscardedCard && hasDiscardedCard2) || !hasDealtCards)
         {
             DrawButton.GetComponent<Button>().interactable = false;
             endTurnButton.GetComponent<Button>().interactable = false;
         }
-        else if(hasDiscardedCard && hasDrewCard)
+        else if((hasDiscardedCard && hasDrewCard) || (hasDrewCard && !hasDiscardedCard && !hasDiscardedCard2))
         {
             DrawButton.GetComponent<Button>().interactable = false;
             endTurnButton.GetComponent<Button>().interactable = true;
         }
-        else if (!hasDrewCard && hasDealtCards)
-        {
-            DrawButton.GetComponent<Button>().interactable = true;
-            endTurnButton.GetComponent<Button>().interactable = true;
+        else if (!hasDrewCard && hasDealtCards && staticDeck.Count > 0) { 
+            if((TurnSystem.isPlayer1Turn && !hasCompleteStackP1) || (TurnSystem.isPlayer2Turn && !hasCompleteStackP2) || (TurnSystem.isPlayer3Turn && !hasCompleteStackP3) || (TurnSystem.isPlayer4Turn && !hasCompleteStackP4))
+            {
+                DrawButton.GetComponent<Button>().interactable = true;
+                endTurnButton.GetComponent<Button>().interactable = true;
+            }
+            else
+            {
+                endTurnButton.GetComponent<Button>().interactable = true;
+                DrawButton.GetComponent<Button>().interactable = false;
+            }
         }
 
         if (TurnSystem.isPlayer1Turn && hasDealtCards && (GameObject.Find("Discarded Player 1").transform.childCount > 0 || Hand.transform.childCount == 0))
@@ -279,19 +331,23 @@ public class PlayerDeck : MonoBehaviour
                 hasDiscardedCard = true;
             }
         }
+        else
+        {
+            hasDiscardedCard = false;
+        }
 
         for (int i = 0; i < player1StackCardsp.Count; i++)
         {
             if (player1StackCardsp[i].id == 0 || player1StackCardsp[i].id == 1 || player1StackCardsp[i].id == 2 || player1StackCardsp[i].id == 3 || player1StackCardsp[i].id == 4)//CR
                 p1has1 = true;
 
-            if (player1StackCardsp[i].id == 5 || player1StackCardsp[i].id == 6 || player1StackCardsp[i].id == 7 || player1StackCardsp[i].id == 8)//VC
+            if (player1StackCardsp[i].id == 5 || player1StackCardsp[i].id == 6 || player1StackCardsp[i].id == 7 || player1StackCardsp[i].id == 8 || player1StackCardsp[i].id == 43)//VC
                 p1has2 = true;
 
             if (player1StackCardsp[i].id == 9 || player1StackCardsp[i].id == 10 || player1StackCardsp[i].id == 11 || player1StackCardsp[i].id == 12 || player1StackCardsp[i].id == 13)//CN
                 p1has3 = true;
 
-            if (player1StackCardsp[i].id == 14 || player1StackCardsp[i].id == 15 || player1StackCardsp[i].id == 16 || player1StackCardsp[i].id == 17)//IT
+            if (player1StackCardsp[i].id == 14 || player1StackCardsp[i].id == 15 || player1StackCardsp[i].id == 16 || player1StackCardsp[i].id == 17 || player1StackCardsp[i].id == 42)//IT
                 p1has4 = true;
 
             if (player1StackCardsp[i].id == 18 || player1StackCardsp[i].id == 19 || player1StackCardsp[i].id == 20 || player1StackCardsp[i].id == 21 || player1StackCardsp[i].id == 22)//PM
@@ -303,13 +359,13 @@ public class PlayerDeck : MonoBehaviour
             if (player2StackCardsp[i].id == 0 || player2StackCardsp[i].id == 1 || player2StackCardsp[i].id == 2 || player2StackCardsp[i].id == 3 || player2StackCardsp[i].id == 4)//CR
                 p2has1 = true;
             
-            if (player2StackCardsp[i].id == 5 || player2StackCardsp[i].id == 6 || player2StackCardsp[i].id == 7 || player2StackCardsp[i].id == 8)//VC
+            if (player2StackCardsp[i].id == 5 || player2StackCardsp[i].id == 6 || player2StackCardsp[i].id == 7 || player2StackCardsp[i].id == 8 || player2StackCardsp[i].id == 43)//VC
                 p2has2 = true;
             
             if (player2StackCardsp[i].id == 9 || player2StackCardsp[i].id == 10 || player2StackCardsp[i].id == 11 || player2StackCardsp[i].id == 12 || player2StackCardsp[i].id == 13)//CN
                 p2has3 = true;
            
-            if (player2StackCardsp[i].id == 14 || player2StackCardsp[i].id == 15 || player2StackCardsp[i].id == 16 || player2StackCardsp[i].id == 17)//IT
+            if (player2StackCardsp[i].id == 14 || player2StackCardsp[i].id == 15 || player2StackCardsp[i].id == 16 || player2StackCardsp[i].id == 17 || player2StackCardsp[i].id == 42)//IT
                 p2has4 = true;
             
             if (player2StackCardsp[i].id == 18 || player2StackCardsp[i].id == 19 || player2StackCardsp[i].id == 20 || player2StackCardsp[i].id == 21 || player2StackCardsp[i].id == 22)//PM
@@ -321,13 +377,13 @@ public class PlayerDeck : MonoBehaviour
             if (player3StackCardsp[i].id == 0 || player3StackCardsp[i].id == 1 || player3StackCardsp[i].id == 2 || player3StackCardsp[i].id == 3 || player3StackCardsp[i].id == 4)//CR
                 p3has1 = true;
             
-            if (player3StackCardsp[i].id == 5 || player3StackCardsp[i].id == 6 || player3StackCardsp[i].id == 7 || player3StackCardsp[i].id == 8)//VC
+            if (player3StackCardsp[i].id == 5 || player3StackCardsp[i].id == 6 || player3StackCardsp[i].id == 7 || player3StackCardsp[i].id == 8 || player3StackCardsp[i].id == 43)//VC
                 p3has2 = true;
             
             if (player3StackCardsp[i].id == 9 || player3StackCardsp[i].id == 10 || player3StackCardsp[i].id == 11 || player3StackCardsp[i].id == 12 || player3StackCardsp[i].id == 13)//CN
                 p3has3 = true;
            
-            if (player3StackCardsp[i].id == 14 || player3StackCardsp[i].id == 15 || player3StackCardsp[i].id == 16 || player3StackCardsp[i].id == 17)//IT
+            if (player3StackCardsp[i].id == 14 || player3StackCardsp[i].id == 15 || player3StackCardsp[i].id == 16 || player3StackCardsp[i].id == 17 || player3StackCardsp[i].id == 42)//IT
                 p3has4 = true;
             
             if (player3StackCardsp[i].id == 18 || player3StackCardsp[i].id == 19 || player3StackCardsp[i].id == 20 || player3StackCardsp[i].id == 21 || player3StackCardsp[i].id == 22)//PM
@@ -339,13 +395,13 @@ public class PlayerDeck : MonoBehaviour
             if (player4StackCardsp[i].id == 0 || player4StackCardsp[i].id == 1 || player4StackCardsp[i].id == 2 || player4StackCardsp[i].id == 3 || player4StackCardsp[i].id == 4)//CR
                 p4has1 = true;
             
-            if (player4StackCardsp[i].id == 5 || player4StackCardsp[i].id == 6 || player4StackCardsp[i].id == 7 || player4StackCardsp[i].id == 8)//VC
+            if (player4StackCardsp[i].id == 5 || player4StackCardsp[i].id == 6 || player4StackCardsp[i].id == 7 || player4StackCardsp[i].id == 8 || player4StackCardsp[i].id == 43)//VC
                 p4has2 = true;
             
             if (player4StackCardsp[i].id == 9 || player4StackCardsp[i].id == 10 || player4StackCardsp[i].id == 11 || player4StackCardsp[i].id == 12 || player4StackCardsp[i].id == 13)//CN
                 p4has3 = true;
            
-            if (player4StackCardsp[i].id == 14 || player4StackCardsp[i].id == 15 || player4StackCardsp[i].id == 16 || player4StackCardsp[i].id == 17)//IT
+            if (player4StackCardsp[i].id == 14 || player4StackCardsp[i].id == 15 || player4StackCardsp[i].id == 16 || player4StackCardsp[i].id == 17 || player4StackCardsp[i].id == 42)//IT
                 p4has4 = true;
             
             if (player4StackCardsp[i].id == 18 || player4StackCardsp[i].id == 19 || player4StackCardsp[i].id == 20 || player4StackCardsp[i].id == 21 || player4StackCardsp[i].id == 22)//PM
@@ -381,7 +437,7 @@ public class PlayerDeck : MonoBehaviour
         }
         
         if(((TurnSystem.isPlayer1Turn && hasCompleteStackP1) || (TurnSystem.isPlayer2Turn && hasCompleteStackP2)
-            || (TurnSystem.isPlayer3Turn && hasCompleteStackP3) || (TurnSystem.isPlayer4Turn && hasCompleteStackP4)) && !hasDrewCard)
+            || (TurnSystem.isPlayer3Turn && hasCompleteStackP3) || (TurnSystem.isPlayer4Turn && hasCompleteStackP4)) && !hasDrewCard && staticEventDeck.Count > 0)
         {
             DrawEventButton.GetComponent<Button>().interactable = true;
         }
@@ -390,7 +446,8 @@ public class PlayerDeck : MonoBehaviour
             DrawEventButton.GetComponent<Button>().interactable = false;
         }
 
-        if(eventCard != null && (eventCard.GetComponent<ThisCard>().id == 23 || eventCard.GetComponent<ThisCard>().id == 24 || eventCard.GetComponent<ThisCard>().id == 25 || eventCard.GetComponent<ThisCard>().id == 26 || eventCard.GetComponent<ThisCard>().id == 27))
+        if(eventCard != null && (eventCard.GetComponent<ThisCard>().id == 23 || eventCard.GetComponent<ThisCard>().id == 24 || eventCard.GetComponent<ThisCard>().id == 25 || eventCard.GetComponent<ThisCard>().id == 26 || eventCard.GetComponent<ThisCard>().id == 27
+            || eventCard.GetComponent<ThisCard>().id == 39 || eventCard.GetComponent<ThisCard>().id == 40 || eventCard.GetComponent<ThisCard>().id == 41))
         {
             PerformEventButton.GetComponent<Button>().interactable = true;
         }
@@ -400,7 +457,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for(int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if((player1StackCardsp[i].id == 0 || player1StackCardsp[i].id == 1 || player1StackCardsp[i].id == 2 || player1StackCardsp[i].id == 3 || player1StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if((player1StackCardsp[i].id == 0 || player1StackCardsp[i].id == 1 || player1StackCardsp[i].id == 2 || player1StackCardsp[i].id == 3 || player1StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -411,7 +468,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 0 || player2StackCardsp[i].id == 1 || player2StackCardsp[i].id == 2 || player2StackCardsp[i].id == 3 || player2StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player2StackCardsp[i].id == 0 || player2StackCardsp[i].id == 1 || player2StackCardsp[i].id == 2 || player2StackCardsp[i].id == 3 || player2StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -422,7 +479,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 0 || player3StackCardsp[i].id == 1 || player3StackCardsp[i].id == 2 || player3StackCardsp[i].id == 3 || player3StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player3StackCardsp[i].id == 0 || player3StackCardsp[i].id == 1 || player3StackCardsp[i].id == 2 || player3StackCardsp[i].id == 3 || player3StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -433,7 +490,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 0 || player4StackCardsp[i].id == 1 || player4StackCardsp[i].id == 2 || player4StackCardsp[i].id == 3 || player4StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player4StackCardsp[i].id == 0 || player4StackCardsp[i].id == 1 || player4StackCardsp[i].id == 2 || player4StackCardsp[i].id == 3 || player4StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -447,7 +504,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 9 || player1StackCardsp[i].id == 10 || player1StackCardsp[i].id == 11 || player1StackCardsp[i].id == 12 || player1StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player1StackCardsp[i].id == 9 || player1StackCardsp[i].id == 10 || player1StackCardsp[i].id == 11 || player1StackCardsp[i].id == 12 || player1StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -458,7 +515,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 9 || player2StackCardsp[i].id == 10 || player2StackCardsp[i].id == 11 || player2StackCardsp[i].id == 12 || player2StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player2StackCardsp[i].id == 9 || player2StackCardsp[i].id == 10 || player2StackCardsp[i].id == 11 || player2StackCardsp[i].id == 12 || player2StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -469,7 +526,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 9 || player3StackCardsp[i].id == 10 || player3StackCardsp[i].id == 11 || player3StackCardsp[i].id == 12 || player3StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player3StackCardsp[i].id == 9 || player3StackCardsp[i].id == 10 || player3StackCardsp[i].id == 11 || player3StackCardsp[i].id == 12 || player3StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -480,7 +537,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 9 || player4StackCardsp[i].id == 10 || player4StackCardsp[i].id == 11 || player4StackCardsp[i].id == 12 || player4StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player4StackCardsp[i].id == 9 || player4StackCardsp[i].id == 10 || player4StackCardsp[i].id == 11 || player4StackCardsp[i].id == 12 || player4StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -494,7 +551,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 5 || player1StackCardsp[i].id == 6 || player1StackCardsp[i].id == 7 || player1StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player1StackCardsp[i].id == 5 || player1StackCardsp[i].id == 6 || player1StackCardsp[i].id == 7 || player1StackCardsp[i].id == 8 || player1StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -505,7 +562,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 5 || player2StackCardsp[i].id == 6 || player2StackCardsp[i].id == 7 || player2StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player2StackCardsp[i].id == 5 || player2StackCardsp[i].id == 6 || player2StackCardsp[i].id == 7 || player2StackCardsp[i].id == 8 || player2StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -516,7 +573,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 5 || player3StackCardsp[i].id == 6 || player3StackCardsp[i].id == 7 || player3StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player3StackCardsp[i].id == 5 || player3StackCardsp[i].id == 6 || player3StackCardsp[i].id == 7 || player3StackCardsp[i].id == 8 || player3StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -527,7 +584,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 5 || player4StackCardsp[i].id == 6 || player4StackCardsp[i].id == 7 || player4StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player4StackCardsp[i].id == 5 || player4StackCardsp[i].id == 6 || player4StackCardsp[i].id == 7 || player4StackCardsp[i].id == 8 || player4StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -541,7 +598,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 14 || player1StackCardsp[i].id == 15 || player1StackCardsp[i].id == 16 || player1StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player1StackCardsp[i].id == 14 || player1StackCardsp[i].id == 15 || player1StackCardsp[i].id == 16 || player1StackCardsp[i].id == 17 || player1StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -552,7 +609,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 14 || player2StackCardsp[i].id == 15 || player2StackCardsp[i].id == 16 || player2StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player2StackCardsp[i].id == 14 || player2StackCardsp[i].id == 15 || player2StackCardsp[i].id == 16 || player2StackCardsp[i].id == 17 || player2StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -563,7 +620,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 14 || player3StackCardsp[i].id == 15 || player3StackCardsp[i].id == 16 || player3StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player3StackCardsp[i].id == 14 || player3StackCardsp[i].id == 15 || player3StackCardsp[i].id == 16 || player3StackCardsp[i].id == 17 || player3StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -574,7 +631,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 14 || player4StackCardsp[i].id == 15 || player4StackCardsp[i].id == 16 || player4StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player4StackCardsp[i].id == 14 || player4StackCardsp[i].id == 15 || player4StackCardsp[i].id == 16 || player4StackCardsp[i].id == 17 || player4StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -588,7 +645,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 18 || player1StackCardsp[i].id == 19 || player1StackCardsp[i].id == 20 || player1StackCardsp[i].id == 21 || player1StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player1StackCardsp[i].id == 18 || player1StackCardsp[i].id == 19 || player1StackCardsp[i].id == 20 || player1StackCardsp[i].id == 21 || player1StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -599,7 +656,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if((player2StackCardsp[i].id == 18 || player2StackCardsp[i].id == 19 || player2StackCardsp[i].id == 20 || player2StackCardsp[i].id == 21 || player2StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if((player2StackCardsp[i].id == 18 || player2StackCardsp[i].id == 19 || player2StackCardsp[i].id == 20 || player2StackCardsp[i].id == 21 || player2StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -610,7 +667,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 18 || player3StackCardsp[i].id == 19 || player3StackCardsp[i].id == 20 || player3StackCardsp[i].id == 21 || player3StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player3StackCardsp[i].id == 18 || player3StackCardsp[i].id == 19 || player3StackCardsp[i].id == 20 || player3StackCardsp[i].id == 21 || player3StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -621,7 +678,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 18 || player4StackCardsp[i].id == 19 || player4StackCardsp[i].id == 20 || player4StackCardsp[i].id == 21 || player4StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
+                    if ((player4StackCardsp[i].id == 18 || player4StackCardsp[i].id == 19 || player4StackCardsp[i].id == 20 || player4StackCardsp[i].id == 21 || player4StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 2)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -635,7 +692,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 0 || player1StackCardsp[i].id == 1 || player1StackCardsp[i].id == 2 || player1StackCardsp[i].id == 3 || player1StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player1StackCardsp[i].id == 0 || player1StackCardsp[i].id == 1 || player1StackCardsp[i].id == 2 || player1StackCardsp[i].id == 3 || player1StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -646,7 +703,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 0 || player2StackCardsp[i].id == 1 || player2StackCardsp[i].id == 2 || player2StackCardsp[i].id == 3 || player2StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player2StackCardsp[i].id == 0 || player2StackCardsp[i].id == 1 || player2StackCardsp[i].id == 2 || player2StackCardsp[i].id == 3 || player2StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -657,7 +714,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 0 || player3StackCardsp[i].id == 1 || player3StackCardsp[i].id == 2 || player3StackCardsp[i].id == 3 || player3StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player3StackCardsp[i].id == 0 || player3StackCardsp[i].id == 1 || player3StackCardsp[i].id == 2 || player3StackCardsp[i].id == 3 || player3StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -668,7 +725,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 0 || player4StackCardsp[i].id == 1 || player4StackCardsp[i].id == 2 || player4StackCardsp[i].id == 3 || player4StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player4StackCardsp[i].id == 0 || player4StackCardsp[i].id == 1 || player4StackCardsp[i].id == 2 || player4StackCardsp[i].id == 3 || player4StackCardsp[i].id == 4) && CR.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -682,7 +739,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 9 || player1StackCardsp[i].id == 10 || player1StackCardsp[i].id == 11 || player1StackCardsp[i].id == 12 || player1StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player1StackCardsp[i].id == 9 || player1StackCardsp[i].id == 10 || player1StackCardsp[i].id == 11 || player1StackCardsp[i].id == 12 || player1StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -693,7 +750,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 9 || player2StackCardsp[i].id == 10 || player2StackCardsp[i].id == 11 || player2StackCardsp[i].id == 12 || player2StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player2StackCardsp[i].id == 9 || player2StackCardsp[i].id == 10 || player2StackCardsp[i].id == 11 || player2StackCardsp[i].id == 12 || player2StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -704,7 +761,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 9 || player3StackCardsp[i].id == 10 || player3StackCardsp[i].id == 11 || player3StackCardsp[i].id == 12 || player3StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player3StackCardsp[i].id == 9 || player3StackCardsp[i].id == 10 || player3StackCardsp[i].id == 11 || player3StackCardsp[i].id == 12 || player3StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -715,7 +772,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 9 || player4StackCardsp[i].id == 10 || player4StackCardsp[i].id == 11 || player4StackCardsp[i].id == 12 || player4StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player4StackCardsp[i].id == 9 || player4StackCardsp[i].id == 10 || player4StackCardsp[i].id == 11 || player4StackCardsp[i].id == 12 || player4StackCardsp[i].id == 13) && CN.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -729,7 +786,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 5 || player1StackCardsp[i].id == 6 || player1StackCardsp[i].id == 7 || player1StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player1StackCardsp[i].id == 5 || player1StackCardsp[i].id == 6 || player1StackCardsp[i].id == 7 || player1StackCardsp[i].id == 8 || player1StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -740,7 +797,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 5 || player2StackCardsp[i].id == 6 || player2StackCardsp[i].id == 7 || player2StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player2StackCardsp[i].id == 5 || player2StackCardsp[i].id == 6 || player2StackCardsp[i].id == 7 || player2StackCardsp[i].id == 8 || player2StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -751,7 +808,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 5 || player3StackCardsp[i].id == 6 || player3StackCardsp[i].id == 7 || player3StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player3StackCardsp[i].id == 5 || player3StackCardsp[i].id == 6 || player3StackCardsp[i].id == 7 || player3StackCardsp[i].id == 8 || player3StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -762,7 +819,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 5 || player4StackCardsp[i].id == 6 || player4StackCardsp[i].id == 7 || player4StackCardsp[i].id == 8) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player4StackCardsp[i].id == 5 || player4StackCardsp[i].id == 6 || player4StackCardsp[i].id == 7 || player4StackCardsp[i].id == 8 || player4StackCardsp[i].id == 43) && VC.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -776,7 +833,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 14 || player1StackCardsp[i].id == 15 || player1StackCardsp[i].id == 16 || player1StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player1StackCardsp[i].id == 14 || player1StackCardsp[i].id == 15 || player1StackCardsp[i].id == 16 || player1StackCardsp[i].id == 17 || player1StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -787,7 +844,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 14 || player2StackCardsp[i].id == 15 || player2StackCardsp[i].id == 16 || player2StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player2StackCardsp[i].id == 14 || player2StackCardsp[i].id == 15 || player2StackCardsp[i].id == 16 || player2StackCardsp[i].id == 17 || player2StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -798,7 +855,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 14 || player3StackCardsp[i].id == 15 || player3StackCardsp[i].id == 16 || player3StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player3StackCardsp[i].id == 14 || player3StackCardsp[i].id == 15 || player3StackCardsp[i].id == 16 || player3StackCardsp[i].id == 17 || player3StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -809,7 +866,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 14 || player4StackCardsp[i].id == 15 || player4StackCardsp[i].id == 16 || player4StackCardsp[i].id == 17) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player4StackCardsp[i].id == 14 || player4StackCardsp[i].id == 15 || player4StackCardsp[i].id == 16 || player4StackCardsp[i].id == 17 || player4StackCardsp[i].id == 42) && IT.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -823,7 +880,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player1StackCardsp.Count; i++)
                 {
-                    if ((player1StackCardsp[i].id == 18 || player1StackCardsp[i].id == 19 || player1StackCardsp[i].id == 20 || player1StackCardsp[i].id == 21 || player1StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player1StackCardsp[i].id == 18 || player1StackCardsp[i].id == 19 || player1StackCardsp[i].id == 20 || player1StackCardsp[i].id == 21 || player1StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -834,7 +891,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player2StackCardsp.Count; i++)
                 {
-                    if ((player2StackCardsp[i].id == 18 || player2StackCardsp[i].id == 19 || player2StackCardsp[i].id == 20 || player2StackCardsp[i].id == 21 || player2StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player2StackCardsp[i].id == 18 || player2StackCardsp[i].id == 19 || player2StackCardsp[i].id == 20 || player2StackCardsp[i].id == 21 || player2StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -845,7 +902,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player3StackCardsp.Count; i++)
                 {
-                    if ((player3StackCardsp[i].id == 18 || player3StackCardsp[i].id == 19 || player3StackCardsp[i].id == 20 || player3StackCardsp[i].id == 21 || player3StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player3StackCardsp[i].id == 18 || player3StackCardsp[i].id == 19 || player3StackCardsp[i].id == 20 || player3StackCardsp[i].id == 21 || player3StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -856,7 +913,7 @@ public class PlayerDeck : MonoBehaviour
             {
                 for (int i = 0; i < player4StackCardsp.Count; i++)
                 {
-                    if ((player4StackCardsp[i].id == 18 || player4StackCardsp[i].id == 19 || player4StackCardsp[i].id == 20 || player4StackCardsp[i].id == 21 || player4StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
+                    if ((player4StackCardsp[i].id == 18 || player4StackCardsp[i].id == 19 || player4StackCardsp[i].id == 20 || player4StackCardsp[i].id == 21 || player4StackCardsp[i].id == 22) && PM.transform.GetChild(0).GetComponent<ThisCard>().tier >= 3)
                     {
                         PerformEventButton.GetComponent<Button>().interactable = true;
                         break;
@@ -867,7 +924,11 @@ public class PlayerDeck : MonoBehaviour
               
         if(player1StackCardsp.Count < 5)
         {
-            p1score = 0;
+            if(p1score >= 5)
+            {
+                p1score -= 5;
+            }
+            
             hasCompleteStackP1 = false;
             p1has1 = false;
             p1has2 = false;
@@ -878,7 +939,11 @@ public class PlayerDeck : MonoBehaviour
         
         if (player2StackCardsp.Count < 5)
         {
-            p2score = 0;
+            if (p2score >= 5)
+            {
+                p2score -= 5;
+            }
+
             hasCompleteStackP2 = false;
             p2has1 = false;
             p2has2 = false;
@@ -889,7 +954,11 @@ public class PlayerDeck : MonoBehaviour
         
         if (player3StackCardsp.Count < 5)
         {
-            p3score = 0;
+            if (p3score >= 5)
+            {
+                p3score -= 5;
+            }
+
             hasCompleteStackP3 = false;
             p3has1 = false;
             p3has2 = false;
@@ -900,7 +969,11 @@ public class PlayerDeck : MonoBehaviour
         
         if (player4StackCardsp.Count < 5)
         {
-            p4score = 0;
+            if (p4score >= 5)
+            {
+                p4score -= 5;
+            }
+
             hasCompleteStackP4 = false;
             p4has1 = false;
             p4has2 = false;
@@ -921,14 +994,12 @@ public class PlayerDeck : MonoBehaviour
 
         for (int i = 0; i < x; i++)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
             if (drawType == "Upgrade")
             {
                 GameObject c1 = Instantiate(CardToHand, transform.position, transform.rotation, Hand.transform);
-                c1.name = "Player 1 Event Card " + cardNo;
-                c1.GetComponent<ThisCard>().cardIndex = cardNo;
+               // c1.name = "Player 1 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                 c1.GetComponent<ThisCard>().cardType = "Event";
-                cardNo++;
             }
             else
             {
@@ -937,17 +1008,29 @@ public class PlayerDeck : MonoBehaviour
                 if (drawType == "Event")
                 {
                     eventCard = c1;
-                    eventCard.name = "Player 1 Event Card " + cardNo;
-                    eventCard.GetComponent<ThisCard>().cardIndex = cardNo;
+                   // eventCard.name = "Player 1 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                     eventCard.GetComponent<ThisCard>().cardType = "Event";
                 }
                 else
                 {
-                    c1.name = "Player 1 Normal Card " + cardNo;
-                    c1.GetComponent<ThisCard>().cardIndex = cardNo;
+                    //c1.name = "Player 1 Normal Card " + c1.GetComponent<ThisCard>().cardIndex;
+                    //Debug.Log("Player Deck index is " + CardToHand.GetComponent<ThisCard>().id);
                     c1.GetComponent<ThisCard>().cardType = "Normal";
                 }
-                cardNo++;
+            }
+            if( i == 4)
+            {
+                yield return new WaitForSeconds(0.5f);
+                TurnSystem.isPlayer1Turn = false;
+                TurnSystem.isPlayer2Turn = true;
+                hasClicked2 = false;
+                if (hasDealtCards)
+                {
+                    Debug.Log("Hello");
+                    hasClicked = true;
+                    hasClicked2 = false;
+                }
+                DealCards.GetComponent<Button>().interactable = true;
             }
         }
     }
@@ -958,37 +1041,46 @@ public class PlayerDeck : MonoBehaviour
 
         for (int i = 0; i < z; i++)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
             GameObject c1;
             if (drawType == "Upgrade")
             {
                 c1 = Instantiate(CardToHand, transform.position, transform.rotation, Hand4.transform);
-                c1.name = "Player 4 Event Card " + cardNo;
-                c1.GetComponent<ThisCard>().cardIndex = cardNo;
+                //c1.name = "Player 4 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                 c1.GetComponent<ThisCard>().cardType = "Event";
-               // eventCard = null;
-                cardNo++;
             }
             else
             {
-                c1 = (GameObject)Instantiate(CardToHand, transform.position, transform.rotation, Hand4.transform);
+                c1 = Instantiate(CardToHand, transform.position, transform.rotation, Hand4.transform);
 
                 if (drawType == "Event")
                 {
                     eventCard = c1;
-                    eventCard.name = "Player 4 Event Card " + cardNo;
-                    eventCard.GetComponent<ThisCard>().cardIndex = cardNo;
+                   //eventCard.name = "Player 4 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                     eventCard.GetComponent<ThisCard>().cardType = "Event";
                 }
                 else
                 {
-                    c1.name = "Player 4 Normal Card " + cardNo;
-                    c1.GetComponent<ThisCard>().cardIndex = cardNo;
+                    //c1.name = "Player 4 Normal Card " + c1.GetComponent<ThisCard>().cardIndex;
+                    //Debug.Log("Player Deck index is " + c1.GetComponent<ThisCard>().cardIndex);
                     c1.GetComponent<ThisCard>().cardType = "Normal";
                 }
-                cardNo++;
             }
             c1.transform.Rotate(0, 0, -90);
+            if (i == 4)
+            {
+                yield return new WaitForSeconds(0.5f);
+                TurnSystem.isPlayer4Turn = false;
+                TurnSystem.isPlayer1Turn = true;
+                hasClicked2 = false;
+                if (hasDealtCards)
+                {
+                    Debug.Log("Hello");
+                    hasClicked = true;
+                    hasClicked2 = false;
+                }
+                DealCards.GetComponent<Button>().interactable = true;
+            }
         }
     }
 
@@ -998,37 +1090,45 @@ public class PlayerDeck : MonoBehaviour
 
         for (int i = 0; i < z; i++)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
             GameObject c1;
             if (drawType == "Upgrade")
             {
                 c1 = Instantiate(CardToHand, transform.position, transform.rotation, Hand2.transform);
-                c1.name = "Player 2 Event Card " + cardNo;
-                c1.GetComponent<ThisCard>().cardIndex = cardNo;
+               // c1.name = "Player 2 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                 c1.GetComponent<ThisCard>().cardType = "Event";
-                //eventCard = null;
-                cardNo++;
             }
             else
             {
-                c1 = (GameObject)Instantiate(CardToHand, transform.position, transform.rotation, Hand2.transform);
+                c1 = Instantiate(CardToHand, transform.position, transform.rotation, Hand2.transform);
                                 
                 if (drawType == "Event")
                 {
                     eventCard = c1;
-                    eventCard.name = "Player 2 Event Card " + cardNo;
-                    eventCard.GetComponent<ThisCard>().cardIndex = cardNo;
+                  //  eventCard.name = "Player 2 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                     eventCard.GetComponent<ThisCard>().cardType = "Event";
                 }
                 else
                 {
-                    c1.name = "Player 2 Normal Card " + cardNo;
-                    c1.GetComponent<ThisCard>().cardIndex = cardNo;
+                  //  c1.name = "Player 2 Normal Card " + c1.GetComponent<ThisCard>().cardIndex;
+                  //  Debug.Log("Player Deck index is " + c1.GetComponent<ThisCard>().cardIndex);
                     c1.GetComponent<ThisCard>().cardType = "Normal";
                 }
-                cardNo++;
             }
             c1.transform.Rotate(0, 0, 90);
+            if (i == 4)
+            {
+                yield return new WaitForSeconds(0.5f);
+                TurnSystem.isPlayer2Turn = false;
+                TurnSystem.isPlayer3Turn = true;
+                if (hasDealtCards)
+                {
+                    Debug.Log("Hello");
+                    hasClicked = true;
+                    hasClicked2 = false;
+                }
+                DealCards.GetComponent<Button>().interactable = true;
+            }
         }
     }
 
@@ -1038,16 +1138,14 @@ public class PlayerDeck : MonoBehaviour
 
         for (int i = 0; i < z; i++)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(1f);
             GameObject c1;
             if (drawType == "Upgrade")
             {
                 c1 = Instantiate(CardToHand, transform.position, transform.rotation, Hand3.transform);
-                c1.name = "Player 3 Event Card " + cardNo;
-                c1.GetComponent<ThisCard>().cardIndex = cardNo;
+                //c1.name = "Player 3 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
+                
                 c1.GetComponent<ThisCard>().cardType = "Event";
-                eventCard = null;
-                cardNo++;
             }
             else
             {
@@ -1056,19 +1154,30 @@ public class PlayerDeck : MonoBehaviour
                 if (drawType == "Event")
                 {
                     eventCard = c1;
-                    eventCard.name = "Player 3 Event Card " + cardNo;
-                    eventCard.GetComponent<ThisCard>().cardIndex = cardNo;
+                   // eventCard.name = "Player 3 Event Card " + c1.GetComponent<ThisCard>().cardIndex;
                     eventCard.GetComponent<ThisCard>().cardType = "Event";
                 }
                 else
                 {
-                    c1.name = "Player 3 Normal Card " + cardNo;
-                    c1.GetComponent<ThisCard>().cardIndex = cardNo;
+                  //  c1.name = "Player 3 Normal Card " + c1.GetComponent<ThisCard>().cardIndex;
+                    //Debug.Log("Player Deck index is " + c1.GetComponent<ThisCard>().cardIndex);
                     c1.GetComponent<ThisCard>().cardType = "Normal";
                 }
-                cardNo++;
             }
             c1.transform.Rotate(0, 0, 180);
+            if (i == 4)
+            {
+                yield return new WaitForSeconds(0.5f);
+                TurnSystem.isPlayer3Turn = false;
+                TurnSystem.isPlayer4Turn = true;
+                if (hasDealtCards)
+                {
+                    Debug.Log("Hello");
+                    hasClicked = true;
+                    hasClicked2 = false;
+                }
+                DealCards.GetComponent<Button>().interactable = true;
+            }
         }
     }
 
@@ -1080,8 +1189,9 @@ public class PlayerDeck : MonoBehaviour
     [PunRPC]
     public void RpcStartG()
     {
-        dealCardCallCount++;
         Debug.Log(dealCardCallCount);
+        dealCardCallCount++;
+        hasClicked2 = true;
         if (dealCardCallCount == 4)
         {
             hasDealtCards = true;
@@ -1093,46 +1203,35 @@ public class PlayerDeck : MonoBehaviour
         if (TurnSystem.isPlayer1Turn)
         {
             StartCoroutine(Player1Cards(5, "Tool"));
-            TurnSystem.isPlayer1Turn = false;
-            TurnSystem.isPlayer2Turn = true;
-            return;
+
         }
         else if(TurnSystem.isPlayer2Turn)
         {
             StartCoroutine(Player2Cards(5, "Tool"));
-            TurnSystem.isPlayer2Turn = false;
-            TurnSystem.isPlayer3Turn = true;
-            return;
         }
         else if(TurnSystem.isPlayer3Turn)
         {
             StartCoroutine(Player3Cards(5, "Tool"));
-            TurnSystem.isPlayer3Turn = false;
-            TurnSystem.isPlayer4Turn = true;
-            return;
         }
         else if(TurnSystem.isPlayer4Turn)
         {
             StartCoroutine(Player4Cards(5, "Tool"));
-            TurnSystem.isPlayer4Turn = false;
-            TurnSystem.isPlayer1Turn = true;
-            return;
         }
     }
 
     public void Shuffle()
     {
-        for(int i = 0; i < 23; i++)
+        for(int i = 0; i < 50; i++)
         {
             container[0] = CardDatabase.cardsList[i];
-            int randomIndex = Random.Range(i, 23);
+            int randomIndex = Random.Range(i, 50);
             CardDatabase.cardsList[i] = CardDatabase.cardsList[randomIndex];
             CardDatabase.cardsList[randomIndex] = container[0];
         }
-        for(int i = 23; i < 39; i++)
+        for(int i = 50; i < 90; i++)
         {
             container[0] = CardDatabase.cardsList[i];
-            int randomIndex = Random.Range(i, 39);
+            int randomIndex = Random.Range(i, 90);
             CardDatabase.cardsList[i] = CardDatabase.cardsList[randomIndex];
             CardDatabase.cardsList[randomIndex] = container[0];
         }
@@ -1150,6 +1249,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player1Cards());
             hasDrewCard = true;
+            hasDiscardedCard2 = true; 
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
             endTurnButton.GetComponent<Button>().interactable = false;
@@ -1158,6 +1258,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player2Cards());
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
             endTurnButton.GetComponent<Button>().interactable = false;
@@ -1166,6 +1267,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player3Cards());
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
             endTurnButton.GetComponent<Button>().interactable = false;
@@ -1174,6 +1276,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player4Cards());
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
             endTurnButton.GetComponent<Button>().interactable = false;
@@ -1194,6 +1297,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player1Cards(1,"Event"));
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
         }
@@ -1201,6 +1305,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player2Cards(1, "Event"));
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
         }
@@ -1208,6 +1313,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player3Cards(1, "Event"));
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
         }
@@ -1215,6 +1321,7 @@ public class PlayerDeck : MonoBehaviour
         {
             StartCoroutine(Player4Cards(1, "Event"));
             hasDrewCard = true;
+            hasDiscardedCard2 = true;
             DrawButton.GetComponent<Button>().interactable = false;
             DrawEventButton.GetComponent<Button>().interactable = false;
         }
@@ -1285,5 +1392,99 @@ public class PlayerDeck : MonoBehaviour
             Destroy(eventCard);
             eventCard = null;
         }
+    }
+
+    public void generateQuestion()
+    {
+        quizPanel.SetActive(true);
+        currentQuestion = Random.Range(0, qnA.Count);
+        questionText.text = qnA[currentQuestion].question;
+        SetAnswers();
+        isPerform = false;
+    }
+
+    public void generateQuestionPerform()
+    {
+        quizPanel.SetActive(true);
+        currentQuestion = Random.Range(0, qnA.Count);
+        questionText.text = qnA[currentQuestion].question;
+        SetAnswers();
+        isPerform = true;
+    }
+
+    void SetAnswers()
+    {
+        Debug.Log("Heyy");
+        for (int i = 0; i < options.Length; i++)
+        {
+            options[i].GetComponent<QuizScript>().isCorrect = false;
+            options[i].transform.GetChild(0).GetComponent<Text>().text = qnA[currentQuestion].answers[i];
+            options[i].GetComponent<Image>().color = new Color32(53, 53, 53, 255);
+            if(qnA[currentQuestion].correctAnswer == i + 1)
+            {
+                options[i].GetComponent<QuizScript>().isCorrect = true;
+            }
+        }
+    }
+
+    void Answer()
+    {
+        if (isCorrect)
+        {
+            StartCoroutine(ClosePanel());
+            qnA.RemoveAt(currentQuestion);
+            Debug.Log("Correct Answer!");
+        }
+        else
+        {
+            StartCoroutine(ClosePanel());
+            hasDrewCard = true;
+            hasDiscardedCard = false;
+            hasDiscardedCard2 = false;
+            Debug.Log("Wrong Answer!");
+        }   
+    }
+
+    void AnswerPerform()
+    {
+        if (isCorrect)
+        {
+            StartCoroutine(ClosePanelPerform());
+            qnA.RemoveAt(currentQuestion);
+            Debug.Log("Correct Answer!");
+        }
+        else
+        {
+            StartCoroutine(ClosePanelPerform());
+            Debug.Log("Wrong Answer!");
+        }
+    }
+
+    IEnumerator ClosePanel()
+    {
+        yield return new WaitForSeconds(0.5f);
+        quizPanel.SetActive(false);
+        if (isCorrect)
+        {
+            DrawCard();
+        }
+        isCorrect = false;
+    }
+
+    IEnumerator ClosePanelPerform()
+    {
+        yield return new WaitForSeconds(0.5f);
+        quizPanel.SetActive(false);
+        if (isCorrect)
+        {
+            PerformEvent();
+        }
+        else
+        {
+            Destroy(eventCard);
+            eventCard = null;
+        }
+        isCorrect = false;
+        isPerform = false;
     }
 }

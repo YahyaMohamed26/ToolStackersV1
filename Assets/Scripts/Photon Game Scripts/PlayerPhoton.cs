@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using Photon;
 using Photon.Pun;
 using UnityEngine.UI;
 
-public class PlayerPhoton : MonoBehaviourPun, IPunObservable
+public class PlayerPhoton : MonoBehaviourPun
 {
     public GameObject Hand, Hand2, Hand3, Hand4;
 
@@ -34,7 +33,6 @@ public class PlayerPhoton : MonoBehaviourPun, IPunObservable
                 GameObject.Find("Character 1").GetComponent<Image>().sprite = Resources.Load<Sprite>("Ch 4");
             }
         }
-        DontDestroyOnLoad(gameObject);
     }
 
     [PunRPC]
@@ -155,26 +153,88 @@ public class PlayerPhoton : MonoBehaviourPun, IPunObservable
                 break;
         }
     }
-
-  /**  public void CmdDealCards()
+    public void callSync()
     {
-        for (int i = 0; i < 5; i++)
+        photonView.RPC("SyncScore", RpcTarget.Others, PlayerDeck.p1score, photonView.ViewID);
+    }
+
+    [PunRPC]
+    private void SyncScore(int score, int id)
+    {
+        int myIndex = 0;
+
+        foreach (PlayerPhoton player in FindObjectsOfType<PlayerPhoton>())
         {
-            GameManage.sToolDeckSize--;
-            Debug.Log(GameManage.sToolDeckSize);
-            // string cardName = PlayerManager.sToolCardsDeck[PlayerManager.sToolDeckSize].name;
-            // Debug.Log("HEY " + cardName);
-
-            string cardName = GameManage.sToolCardsDeck[GameManage.sToolDeckSize].name;
-
-
-            Hand = GameObject.Find("Hand");
-
-            PhotonNetwork.Instantiate(cardName, transform.position, transform.rotation);
-           // pcard1.transform.SetParent(Hand.transform, false);
+            if (player.photonView.IsMine)
+            {
+                myIndex = player.photonView.ViewID;
+                break;
+            }
         }
-    } 
-  */
+
+        Debug.Log(myIndex);
+
+        switch (myIndex)
+        {
+            case 1001:
+                switch (id)
+                {
+                    case 2001:
+                        GameObject.Find("Player 2 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 3001:
+                        GameObject.Find("Player 3 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 4001:
+                        GameObject.Find("Player 4 Score").GetComponent<Text>().text = score + "";
+                        break;
+                }
+                break;
+            case 2001:
+                switch (id)
+                {
+                    case 1001:
+                        GameObject.Find("Player 4 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 3001:
+                        GameObject.Find("Player 2 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 4001:
+                        GameObject.Find("Player 3 Score").GetComponent<Text>().text = score + "";
+                        break;
+                }
+                break;
+            case 3001:
+                switch (id)
+                {
+                    case 1001:
+                        GameObject.Find("Player 3 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 2001:
+                        GameObject.Find("Player 4 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 4001:
+                        GameObject.Find("Player 2 Score").GetComponent<Text>().text = score + "";
+                        break;
+                }
+                break;
+            case 4001:
+                switch (id)
+                {
+                    case 1001:
+                        GameObject.Find("Player 2 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 2001:
+                        GameObject.Find("Player 3 Score").GetComponent<Text>().text = score + "";
+                        break;
+                    case 3001:
+                        GameObject.Find("Player 4 Score").GetComponent<Text>().text = score + "";
+                        break;
+                }
+                break;
+        }
+    }
+
     public void DropCard(string parentName, int cardIndex, string cardType, string oldParent = "None")
     {
         photonView.RPC("RpcDropCard", RpcTarget.Others, parentName, cardIndex, cardType, oldParent);
@@ -184,24 +244,19 @@ public class PlayerPhoton : MonoBehaviourPun, IPunObservable
     {
         if (photonView.IsMine && PlayerDeck.p1score == 10)
         {
+
             PlayerDeck.endPanels.SetActive(true);
-            PlayerDeck.panelTexts.GetComponent<Text>().text = "Congrats " + GameObject.Find("Player 1 Name").GetComponent<Text>().text + " you have won!";
+            PlayerDeck.panelTexts.GetComponent<Text>().text ="You have won!";
+            PlayerDeck.hasClicked2 = true;
+            photonView.RPC("RpcWin", RpcTarget.Others, GameObject.Find("Player 1 Name").GetComponent<Text>().text);
         }
-        else if (TurnSystem.isPlayer2Turn && PlayerDeck.p2score == 10)
-        {
-            PlayerDeck.endPanels.SetActive(true);
-            PlayerDeck.panelTexts.GetComponent<Text>().text = GameObject.Find("Player 2 Name").GetComponent<Text>().text + " have won!";
-        }
-        else if (TurnSystem.isPlayer3Turn && PlayerDeck.p3score == 10)
-        {
-            PlayerDeck.endPanels.SetActive(true);
-            PlayerDeck.panelTexts.GetComponent<Text>().text = GameObject.Find("Player 3 Name").GetComponent<Text>().text + " have won!";
-        }
-        else if (TurnSystem.isPlayer4Turn && PlayerDeck.p4score == 10)
-        {
-            PlayerDeck.endPanels.SetActive(true);
-            PlayerDeck.panelTexts.GetComponent<Text>().text = GameObject.Find("Player 4 Name").GetComponent<Text>().text + " have won!";
-        }
+    }
+
+    [PunRPC]
+    private void RpcWin(string name)
+    {
+        PlayerDeck.endPanels.SetActive(true);
+        PlayerDeck.panelTexts.GetComponent<Text>().text = name + " has won!";
     }
 
     [PunRPC]
@@ -317,30 +372,34 @@ public class PlayerPhoton : MonoBehaviourPun, IPunObservable
             Debug.LogError(parentName + " not found");
         }
 
+        Debug.Log("Card is " + cardName + " and Parent is " + parentName);
         if (GameObject.Find(cardName) != null)
         {
             GameObject c = GameObject.Find(cardName);
-            if (parentType == "Hand")
+
+            Debug.Log("Card is " + c.name + " and Parent is " + parentName);
+            if (parentType == "Hand" && old == "Discarded")
             {
                 if (TurnSystem.isPlayer1Turn)
                 {
-                    c.name = "Player 1 Normal Card " + cardIndex.ToString();
+                    c.name = "Player 1 " + cardType + " Card " + cardIndex.ToString();
                 }
                 else if (TurnSystem.isPlayer2Turn)
                 {
-                    c.name = "Player 2 Normal Card " + cardIndex.ToString();
+                    c.name = "Player 2 " + cardType + " Card " + cardIndex.ToString();
                 }
                 else if (TurnSystem.isPlayer3Turn)
                 {
-                    c.name = "Player 3 Normal Card " + cardIndex.ToString();
+                    c.name = "Player 3 " + cardType + " Card " + cardIndex.ToString();
                 }
                 else if (TurnSystem.isPlayer4Turn)
                 {
-                    c.name = "Player 4 Normal Card " + cardIndex.ToString();
+                    c.name = "Player 4 " + cardType + " Card " + cardIndex.ToString();
                 }
             }
 
             card = c.transform;
+
         }
         else
         {
@@ -351,23 +410,6 @@ public class PlayerPhoton : MonoBehaviourPun, IPunObservable
         {
             card.SetParent(parent);
             card.rotation = parent.rotation;
-        }
-    }
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.IsWriting)
-        {
-            if (TurnSystem.isPlayer1Turn)
-            {
-                stream.SendNext(PlayerDeck.cardNo);
-                Debug.Log("Sending");
-            }
-        }
-        else
-        {
-            PlayerDeck.cardNo = (int)stream.ReceiveNext();
-            Debug.Log("Receiving");
         }
     }
 }

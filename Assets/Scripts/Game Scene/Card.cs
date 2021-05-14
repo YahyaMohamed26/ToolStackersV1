@@ -15,13 +15,14 @@ public class Card
 
     public Sprite logo;
     public int index;
+    public int cardNo;
 
     public Card()
     {
 
     }
 
-    public Card (int _id, string _cardName, int _tier, string _cardDescription, Sprite _logo, int _index)
+    public Card (int _index, string _cardName, int _tier, string _cardDescription, Sprite _logo, int _id, int _cardNo = 0)
     {
         id = _id;
         cardName = _cardName;
@@ -29,6 +30,7 @@ public class Card
         cardDescription = _cardDescription;
         logo = _logo;
         index = _index;
+        cardNo = _cardNo;
     }
 
 }

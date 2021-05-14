@@ -29,7 +29,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
 
         if (transform.parent == GameObject.Find("Hand").transform || transform.parent == GameObject.Find("Discarded Player 4").transform)
         {
-            if(PlayerDeck.hasDrewCard && transform.parent == GameObject.Find("Discarded Player 4").transform)
+            if(PlayerDeck.hasDiscardedCard2 && transform.parent == GameObject.Find("Discarded Player 4").transform)
             {
                 return false;
             }
@@ -91,6 +91,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDra
             }
 
             placeholder.transform.SetSiblingIndex(newSiblingsIndex);
+            //placeholder.transform.SetAsLastSibling();
         }
     }
 

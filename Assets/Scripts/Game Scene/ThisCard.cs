@@ -13,7 +13,7 @@ public class ThisCard : MonoBehaviour
     public string cardName;
     public string owner;
     public int tier;
-    public int power;
+    public int cardIndex;
     public string cardDescription;
 
     public Sprite thisSprite;
@@ -33,6 +33,7 @@ public class ThisCard : MonoBehaviour
 
     public static int numberOfCardsInDeck;
     public static int numberOfCardsInEventDeck;
+    public static int numberOfCardsInUpgradeDeck;
 
     public bool canBeSummon;
     public bool summoned;
@@ -43,8 +44,6 @@ public class ThisCard : MonoBehaviour
     public GameObject stackZone5;
 
     [HideInInspector]
-    public int cardIndex;
-    [HideInInspector]
     public string cardType;
 
     // Start is called before the first frame update
@@ -52,12 +51,18 @@ public class ThisCard : MonoBehaviour
     {
         numberOfCardsInDeck = PlayerDeck.deckSize;
         numberOfCardsInEventDeck = PlayerDeck.eventDeckSize;
+        numberOfCardsInUpgradeDeck = PlayerDeck.upgradeDeckSize;
         canBeSummon = false;
         summoned = false;
         Hand = GameObject.Find("Hand");
         Hand2 = GameObject.Find("Hand2");
         Hand3 = GameObject.Find("Hand3");
         Hand4 = GameObject.Find("Hand4");
+        stackZone = GameObject.Find("PM1");
+        stackZone2 = GameObject.Find("CR1");
+        stackZone3 = GameObject.Find("CN1");
+        stackZone4 = GameObject.Find("IT1");
+        stackZone5 = GameObject.Find("VC1");
         CardViewer = GameObject.Find("CardViewer");
         Discarded1 = GameObject.Find("Discarded Player 1");
         Discarded2 = GameObject.Find("Discarded Player 2");
@@ -71,10 +76,31 @@ public class ThisCard : MonoBehaviour
         //Tool Card Instantiation
         if (this.tag == "Clone" && PlayerDeck.drawType == "Tool")
         {
-            thisCard[0] = PlayerDeck.staticDeck[numberOfCardsInDeck - 1];
+            thisCard[0] = PlayerDeck.staticDeck[PlayerDeck.staticDeck.Count - 1];
             thisSprite = thisCard[0].logo;
             id = thisCard[0].id;
             tier = thisCard[0].tier;
+            cardName = thisCard[0].cardName;
+            cardIndex = thisCard[0].cardNo;
+            if (TurnSystem.isPlayer1Turn)
+            {
+                gameObject.name = "Player 1 Normal Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer2Turn)
+            {
+                gameObject.name = "Player 2 Normal Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer3Turn)
+            {
+                gameObject.name = "Player 3 Normal Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer4Turn)
+            {
+                gameObject.name = "Player 4 Normal Card " + cardIndex;
+            }
+
+            Debug.Log("Card Index is " + cardIndex);
+            //logo.GetComponent<Image>().sprite = Resources.Load<Sprite>("CardBack");
 
             if (TurnSystem.isPlayer1Turn)
             {
@@ -100,14 +126,13 @@ public class ThisCard : MonoBehaviour
                 //PlayerDeck.player4Cards.Add(thisCard[0]);
             }
 
-            numberOfCardsInDeck -= 1;
-            PlayerDeck.deckSize -= 1;
+            PlayerDeck.staticDeck.RemoveAt(PlayerDeck.staticDeck.Count - 1);
 
             if (thisCard[0].id == 0 || thisCard[0].id == 1 || thisCard[0].id == 2 || thisCard[0].id == 3 || thisCard[0].id == 4)
             {
                 this.tag = "CR";
             }
-            else if (thisCard[0].id == 5 || thisCard[0].id == 6 || thisCard[0].id == 7 || thisCard[0].id == 8)
+            else if (thisCard[0].id == 5 || thisCard[0].id == 6 || thisCard[0].id == 7 || thisCard[0].id == 8 || thisCard[0].id == 43)
             {
                 this.tag = "VC";
             }
@@ -115,7 +140,7 @@ public class ThisCard : MonoBehaviour
             {
                 this.tag = "CN";
             }
-            else if (thisCard[0].id == 14 || thisCard[0].id == 15 || thisCard[0].id == 16 || thisCard[0].id == 17)
+            else if (thisCard[0].id == 14 || thisCard[0].id == 15 || thisCard[0].id == 16 || thisCard[0].id == 17 || thisCard[0].id == 42)
             {
                 this.tag = "IT";
             }
@@ -132,10 +157,29 @@ public class ThisCard : MonoBehaviour
         //Event, Upgrade Card Instantiation
         if (this.tag == "Clone" && PlayerDeck.drawType == "Event")
         {
-            thisCard[0] = PlayerDeck.staticEventDeck[numberOfCardsInEventDeck - 1];
+            thisCard[0] = PlayerDeck.staticEventDeck[PlayerDeck.staticEventDeck.Count - 1];
+            PlayerDeck.eventCardPlayed = PlayerDeck.staticEventDeck[PlayerDeck.staticEventDeck.Count - 1];
             thisSprite = thisCard[0].logo;
             id = thisCard[0].id;
             tier = thisCard[0].tier;
+            cardIndex = thisCard[0].cardNo;
+            //logo.GetComponent<Image>().sprite = Resources.Load<Sprite>("CardBack");
+            if (TurnSystem.isPlayer1Turn)
+            {
+                gameObject.name = "Player 1 Event Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer2Turn)
+            {
+                gameObject.name = "Player 2 Event Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer3Turn)
+            {
+                gameObject.name = "Player 3 Event Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer4Turn)
+            {
+                gameObject.name = "Player 4 Event Card " + cardIndex;
+            }
 
             if (TurnSystem.isPlayer1Turn)
             {
@@ -157,8 +201,7 @@ public class ThisCard : MonoBehaviour
                 owner = "Hand4";
             }
 
-            numberOfCardsInEventDeck -= 1;
-            PlayerDeck.eventDeckSize -= 1;
+            PlayerDeck.staticEventDeck.RemoveAt(PlayerDeck.staticEventDeck.Count - 1);
 
             if (thisCard[0].id == 38)
             {
@@ -173,10 +216,28 @@ public class ThisCard : MonoBehaviour
         //Upgrade Card Instantiation
         if (this.tag == "Clone" && PlayerDeck.drawType == "Upgrade")
         {
-            thisCard[0] = new Card(38, "Upgrade Card", 1, "None", Resources.Load<Sprite>("7"), 38);
+            thisCard[0] = PlayerDeck.staticUpgradeDeck[PlayerDeck.staticUpgradeDeck.Count - 1];
             thisSprite = thisCard[0].logo;
             id = thisCard[0].id;
             tier = thisCard[0].tier;
+            cardIndex = thisCard[0].cardNo;
+            if (TurnSystem.isPlayer1Turn)
+            {
+                gameObject.name = "Player 1 Event Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer2Turn)
+            {
+                gameObject.name = "Player 2 Event Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer3Turn)
+            {
+                gameObject.name = "Player 3 Event Card " + cardIndex;
+            }
+            else if (TurnSystem.isPlayer4Turn)
+            {
+                gameObject.name = "Player 4 Event Card " + cardIndex;
+            }
+            //logo.GetComponent<Image>().sprite = Resources.Load<Sprite>("CardBack");
 
             if (TurnSystem.isPlayer1Turn)
             {
@@ -197,7 +258,9 @@ public class ThisCard : MonoBehaviour
             {
                 owner = "Hand4";
             }
-            
+
+            PlayerDeck.staticUpgradeDeck.RemoveAt(PlayerDeck.staticUpgradeDeck.Count - 1);
+
             this.tag = "Upgrade";
         }
 
@@ -284,7 +347,7 @@ public class ThisCard : MonoBehaviour
             stackZone5 = GameObject.Find("VC4");
         }
 
-        if(stackZone.transform.childCount == 0)
+        if (stackZone.transform.childCount == 0)
         {
             if (TurnSystem.isPlayer1Turn)
             {
@@ -391,26 +454,31 @@ public class ThisCard : MonoBehaviour
             if (this.tag == "PM Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "PM";
             }
             else if (this.tag == "CR Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CR";
             }
             else if (this.tag == "CN Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CN";
             }
             else if (this.tag == "VC Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "VC";
             }
             else if (this.tag == "IT Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "IT";
             }
 
@@ -430,26 +498,31 @@ public class ThisCard : MonoBehaviour
             if (this.tag == "PM Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "PM";
             }
             else if (this.tag == "CR Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CR";
             }
             else if (this.tag == "CN Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CN";
             }
             else if (this.tag == "VC Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "VC";
             }
             else if (this.tag == "IT Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "IT";
             }
 
@@ -469,26 +542,31 @@ public class ThisCard : MonoBehaviour
             if (this.tag == "PM Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "PM";
             }
             else if (this.tag == "CR Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CR";
             }
             else if (this.tag == "CN Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CN";
             }
             else if (this.tag == "VC Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "VC";
             }
             else if (this.tag == "IT Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "IT";
             }
 
@@ -508,26 +586,31 @@ public class ThisCard : MonoBehaviour
             if (this.tag == "PM Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "PM";
             }
             else if (this.tag == "CR Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CR";
             }
             else if (this.tag == "CN Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "CN";
             }
             else if (this.tag == "VC Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "VC";
             }
             else if (this.tag == "IT Discarded")
             {
                 PlayerDeck.hasDrewCard = true;
+                PlayerDeck.hasDiscardedCard2 = true;
                 this.tag = "IT";
             }
 
@@ -656,84 +739,97 @@ public class ThisCard : MonoBehaviour
         if (summoned == false && this.transform.parent == stackZone.transform) {
             if (TurnSystem.isPlayer1Turn && (owner != "PM1" && owner != "Discarded4") && (this.tag == "PM" || this.tag == "Upgrade"))
             {
-                Debug.Log("Owner is " + owner);
-                owner = "PM1";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone.transform.childCount > 2 && this.tag == "PM")
                 {
-                    if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
-                        }
-                        stackZone.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM1 Title").GetComponent<Text>().text = "PM Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        stackZone.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM1 Title").GetComponent<Text>().text = "PM Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand.transform);
                 }
                 else
                 {
-                    GameObject.Find("PM1 Title").GetComponent<Text>().text = "PM Tier " + tier;
-                    if (tier == 2)
+                    Debug.Log("Owner is " + owner);
+                    owner = "PM1";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p1score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.pm1);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM1 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM1 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p1score += 2;
+                        GameObject.Find("PM1 Title").GetComponent<Text>().text = cardName + " " + tier;
+                        GameObject.Find("PM1 Title2").GetComponent<Text>().text = "PM";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p1score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p1score += 2;
+                        }
+                        PlayerDeck.pm1 = gameObject.name;
+                        PlayerDeck.player1StackCards.Add(thisCard[0]);
+                        PlayerDeck.player1Cards.Remove(thisCard[0]);
                     }
-                    PlayerDeck.player1StackCards.Add(thisCard[0]);
-                    PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -751,83 +847,97 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer2Turn && (owner != "PM2" && owner != "Discarded1") && (this.tag == "PM" || this.tag == "Upgrade"))
             {
-                owner = "PM2";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone.transform.childCount > 1 && this.tag == "PM")
                 {
-                    if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
-                        }
-                        stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM2 Title").GetComponent<Text>().text = "PM Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM2 Title").GetComponent<Text>().text = "PM Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand2.transform);
                 }
                 else
                 {
-                    GameObject.Find("PM2 Title").GetComponent<Text>().text = "PM Tier " + tier;
-                    if(tier == 2)
+                    owner = "PM2";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p2score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.pm2);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM2 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM2 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand2.transform);
+                        }
+
+
                     }
-                    else if(tier == 3)
+                    else
                     {
-                        PlayerDeck.p2score += 2;
+                        GameObject.Find("PM2 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("PM2 Title2").GetComponent<Text>().text = "PM";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p2score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p2score += 2;
+                        }
+                        PlayerDeck.player2StackCards.Add(thisCard[0]);
+                        PlayerDeck.player2Cards.Remove(thisCard[0]);
+                        PlayerDeck.pm2 = gameObject.name;
                     }
-                    PlayerDeck.player2StackCards.Add(thisCard[0]);
-                    PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
 
             }
@@ -846,83 +956,97 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer3Turn && (owner != "PM3" && owner != "Discarded2") && (this.tag == "PM" || this.tag == "Upgrade"))
             {
-                owner = "PM3";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone.transform.childCount > 1 && this.tag == "PM")
                 {
-                    if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
-                        }
-                        stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM3 Title").GetComponent<Text>().text = "PM Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM3 Title").GetComponent<Text>().text = "PM Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand3.transform);
                 }
                 else
                 {
-                    GameObject.Find("PM3 Title").GetComponent<Text>().text = "PM Tier " + tier;
-                    if (tier == 2)
+                    owner = "PM3";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p3score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.pm3);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM3 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM3 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand3.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p3score += 2;
+                        GameObject.Find("PM3 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("PM3 Title2").GetComponent<Text>().text = "PM";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p3score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p3score += 2;
+                        }
+                        PlayerDeck.player3StackCards.Add(thisCard[0]);
+                        PlayerDeck.player3Cards.Remove(thisCard[0]);
+                        PlayerDeck.pm3 = gameObject.name;
                     }
-                    PlayerDeck.player3StackCards.Add(thisCard[0]);
-                    PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
 
             }
@@ -941,83 +1065,97 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer4Turn && (owner != "PM4" && owner != "Discarded3") && (this.tag == "PM" || this.tag == "Upgrade"))
             {
-                owner = "PM4";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone.transform.childCount > 1 && this.tag == "PM")
                 {
-                    if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
-                        }
-                        stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 18)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 19)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 20)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 21)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 22)
-                        {
-                            stackZone.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
-                        }
-                        stackZone.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand4.transform);
                 }
                 else
                 {
-                    GameObject.Find("PM4 Title").GetComponent<Text>().text = "PM Tier " + tier;
-                    if (tier == 2)
+                    owner = "PM4";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p4score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.pm4);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM4 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 18)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 19)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 20)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 21)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 PM");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 22)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 PM");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("PM4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("PM4 Title2").GetComponent<Text>().text = "PM";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand4.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p4score += 2;
+                        GameObject.Find("PM4 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("PM4 Title2").GetComponent<Text>().text = "PM";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p4score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p4score += 2;
+                        }
+                        PlayerDeck.player4StackCards.Add(thisCard[0]);
+                        PlayerDeck.player4Cards.Remove(thisCard[0]);
+                        PlayerDeck.pm4 = gameObject.name;
                     }
-                    PlayerDeck.player4StackCards.Add(thisCard[0]);
-                    PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
 
             }
@@ -1038,83 +1176,98 @@ public class ThisCard : MonoBehaviour
         {
             if (TurnSystem.isPlayer1Turn && (owner != "CR1" && owner != "Discarded4") && (this.tag == "CR" || this.tag == "Upgrade"))
             {
-                owner = "CR1";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone2.transform.childCount > 2 && this.tag == "CR")
                 {
-                    if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
-                        }
-                        stackZone2.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR1 Title").GetComponent<Text>().text = "CR Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
-                        }
-                        else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(1).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        stackZone2.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR1 Title").GetComponent<Text>().text = "CR Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand.transform);
                 }
                 else
                 {
-                    GameObject.Find("CR1 Title").GetComponent<Text>().text = "CR Tier " + tier;
-                    if (tier == 2)
+
+                    owner = "CR1";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p1score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cr1);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR1 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
+                            }
+                            else if (stackZone.transform.GetChild(1).GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR1 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p1score += 2;
+                        GameObject.Find("CR1 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CR1 Title2").GetComponent<Text>().text = "CR";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p1score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p1score += 2;
+                        }
+                        PlayerDeck.player1StackCards.Add(thisCard[0]);
+                        PlayerDeck.player1Cards.Remove(thisCard[0]);
+                        PlayerDeck.cr1 = gameObject.name; 
                     }
-                    PlayerDeck.player1StackCards.Add(thisCard[0]);
-                    PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
 
             }
@@ -1133,83 +1286,98 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer2Turn && (owner != "CR2" && owner != "Discarded1") && (this.tag == "CR" || this.tag == "Upgrade"))
             {
-                owner = "CR2";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone2.transform.childCount > 1 && this.tag == "CR")
                 {
-                    if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
-                        }
-                        stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR2 Title").GetComponent<Text>().text = "CR Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR2 Title").GetComponent<Text>().text = "CR Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand2.transform);
                 }
                 else
                 {
-                    GameObject.Find("CR2 Title").GetComponent<Text>().text = "CR Tier " + tier;
-                    if (tier == 2)
+
+                    owner = "CR2";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p2score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cr2);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR2 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR2 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand2.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p2score += 2;
+                        GameObject.Find("CR2 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CR2 Title2").GetComponent<Text>().text = "CR";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p2score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p2score += 2;
+                        }
+                        PlayerDeck.player2StackCards.Add(thisCard[0]);
+                        PlayerDeck.player2Cards.Remove(thisCard[0]);
+                        PlayerDeck.cr2 = gameObject.name;
                     }
-                    PlayerDeck.player2StackCards.Add(thisCard[0]);
-                    PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -1227,83 +1395,98 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer3Turn && (owner != "CR3" && owner != "Discarded2") && (this.tag == "CR" || this.tag == "Upgrade"))
             {
-                owner = "CR3";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone2.transform.childCount > 1 && this.tag == "CR")
                 {
-                    if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
-                        }
-                        stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR3 Title").GetComponent<Text>().text = "CR Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR3 Title").GetComponent<Text>().text = "CR Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand3.transform);
                 }
                 else
                 {
-                    GameObject.Find("CR3 Title").GetComponent<Text>().text = "CR Tier " + tier;
-                    if (tier == 2)
+
+                    owner = "CR3";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p3score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cr3);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR3 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR3 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand3.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p3score += 2;
+                        GameObject.Find("CR3 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CR3 Title2").GetComponent<Text>().text = "CR";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p3score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p3score += 2;
+                        }
+                        PlayerDeck.player3StackCards.Add(thisCard[0]);
+                        PlayerDeck.player3Cards.Remove(thisCard[0]);
+                        PlayerDeck.cr3 = gameObject.name;
                     }
-                    PlayerDeck.player3StackCards.Add(thisCard[0]);
-                    PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -1321,83 +1504,97 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer4Turn && (owner != "CR4" && owner != "Discarded3") && (this.tag == "CR" || this.tag == "Upgrade"))
             {
-                owner = "CR4";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone2.transform.childCount > 1 && this.tag == "CR")
                 {
-                    if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
-                        }
-                        stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR4 Title").GetComponent<Text>().text = "CR Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 0)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 1)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 2)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
-                        }
-                        else if (stackZone.transform.GetChild(0).GetComponent<ThisCard>().id == 3)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        else if (stackZone2.transform.GetChild(0).GetComponent<ThisCard>().id == 4)
-                        {
-                            stackZone2.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
-                        }
-                        stackZone2.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CR4 Title").GetComponent<Text>().text = "CR Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand4.transform);
                 }
                 else
                 {
-                    GameObject.Find("CR4 Title").GetComponent<Text>().text = "CR Tier " + tier;
-                    if (tier == 2)
+                    owner = "CR4";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p4score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cr4);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR4 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 0)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 1)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 2)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 3)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CR");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 4)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CR");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CR4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CR4 Title2").GetComponent<Text>().text = "CR";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand4.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p4score += 2;
+                        GameObject.Find("CR4 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CR4 Title2").GetComponent<Text>().text = "CR";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p4score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p4score += 2;
+                        }
+                        PlayerDeck.player4StackCards.Add(thisCard[0]);
+                        PlayerDeck.player4Cards.Remove(thisCard[0]);
+                        PlayerDeck.cr4 = gameObject.name;
                     }
-                    PlayerDeck.player4StackCards.Add(thisCard[0]);
-                    PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
 
             }
@@ -1418,83 +1615,97 @@ public class ThisCard : MonoBehaviour
         {
             if (TurnSystem.isPlayer1Turn && (owner != "CN1" && owner != "Discarded4") && (this.tag == "CN" || this.tag == "Upgrade"))
             {
-                owner = "CN1";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone3.transform.childCount > 2 && this.tag == "CN")
                 {
-                    if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
-                        }
-                        stackZone3.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN1 Title").GetComponent<Text>().text = "CI Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(1).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        stackZone3.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN1 Title").GetComponent<Text>().text = "CI Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else
-                    {
-                        Destroy(gameObject);
-                    }
-
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand.transform);
                 }
                 else
                 {
-                    GameObject.Find("CN1 Title").GetComponent<Text>().text = "CI Tier " + tier;
-                    if (tier == 2)
+                    owner = "CN1";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p1score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cn1);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN1 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN1 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p1score += 2;
+                        GameObject.Find("CN1 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CN1 Title2").GetComponent<Text>().text = "CI";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p1score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p1score += 2;
+                        }
+                        PlayerDeck.player1StackCards.Add(thisCard[0]);
+                        PlayerDeck.player1Cards.Remove(thisCard[0]);
+                        PlayerDeck.cn1 = gameObject.name;
                     }
-                    PlayerDeck.player1StackCards.Add(thisCard[0]);
-                    PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -1512,78 +1723,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer2Turn && (owner != "CN2" && owner != "Discarded1") && (this.tag == "CN" || this.tag == "Upgrade"))
             {
-                owner = "CN2";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone3.transform.childCount > 1 && this.tag == "CN")
                 {
-                    if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
-                        }
-                        stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN2 Title").GetComponent<Text>().text = "CI Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN2 Title").GetComponent<Text>().text = "CI Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand2.transform);
                 }
                 else
                 {
-                    GameObject.Find("CN2 Title").GetComponent<Text>().text = "CI Tier " + tier;
-                    if (tier == 2)
+                    owner = "CN2";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p2score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cn2);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN2 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN2 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand2.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p2score += 2;
+                        GameObject.Find("CN2 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CN2 Title2").GetComponent<Text>().text = "CI";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p2score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p2score += 2;
+                        }
+                        PlayerDeck.player2StackCards.Add(thisCard[0]);
+                        PlayerDeck.player2Cards.Remove(thisCard[0]);
+                        PlayerDeck.cn2 = gameObject.name;
                     }
-                    PlayerDeck.player2StackCards.Add(thisCard[0]);
-                    PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
             }
             if (TurnSystem.isPlayer2Turn && owner != "CN2" && this.tag != "CN" && this.tag != "Upgrade")
@@ -1600,78 +1829,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer3Turn && (owner != "CN3" && owner != "Discarded2") && (this.tag == "CN" || this.tag == "Upgrade"))
             {
-                owner = "CN3";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone3.transform.childCount > 1 && this.tag == "CN")
                 {
-                    if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
-                        }
-                        stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN3 Title").GetComponent<Text>().text = "CI Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN3 Title").GetComponent<Text>().text = "CI Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand3.transform);
                 }
                 else
                 {
-                    GameObject.Find("CN3 Title").GetComponent<Text>().text = "CI Tier " + tier;
-                    if (tier == 2)
+                    owner = "CN3";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p3score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cn3);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN3 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN3 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand3.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p3score += 2;
+                        GameObject.Find("CN3 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CN3 Title2").GetComponent<Text>().text = "CI";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p3score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p3score += 2;
+                        }
+                        PlayerDeck.player3StackCards.Add(thisCard[0]);
+                        PlayerDeck.player3Cards.Remove(thisCard[0]);
+                        PlayerDeck.cn3 = gameObject.name;
                     }
-                    PlayerDeck.player3StackCards.Add(thisCard[0]);
-                    PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
             }
             if (TurnSystem.isPlayer3Turn && owner != "CN3" && this.tag != "CN" && this.tag != "Upgrade")
@@ -1688,78 +1935,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer4Turn && (owner != "CN4" && owner != "Discarded3") && (this.tag == "CN" || this.tag == "Upgrade"))
             {
-                owner = "CN4";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone3.transform.childCount > 1 && this.tag == "CN")
                 {
-                    if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
-                        }
-                        stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN4 Title").GetComponent<Text>().text = "CI Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 9)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 10)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 11)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 12)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        else if (stackZone3.transform.GetChild(0).GetComponent<ThisCard>().id == 13)
-                        {
-                            stackZone3.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
-                        }
-                        stackZone3.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("CN4 Title").GetComponent<Text>().text = "CI Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand4.transform);
                 }
                 else
                 {
-                    GameObject.Find("CN4 Title").GetComponent<Text>().text = "CI Tier " + tier;
-                    if (tier == 2)
+                    owner = "CN4";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p4score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.cn4);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN4 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 9)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 10)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 11)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 12)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 CN");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 13)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 CN");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("CN4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("CN4 Title2").GetComponent<Text>().text = "CI";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand4.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p4score += 2;
+                        GameObject.Find("CN4 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("CN4 Title2").GetComponent<Text>().text = "CI";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p4score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p4score += 2;
+                        }
+                        PlayerDeck.player4StackCards.Add(thisCard[0]);
+                        PlayerDeck.player4Cards.Remove(thisCard[0]);
+                        PlayerDeck.cn4 = gameObject.name;
                     }
-                    PlayerDeck.player4StackCards.Add(thisCard[0]);
-                    PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -1779,72 +2044,96 @@ public class ThisCard : MonoBehaviour
         {
             if (TurnSystem.isPlayer1Turn && (owner != "IT1" && owner != "Discarded4") && (this.tag == "IT" || this.tag == "Upgrade"))
             {
-                owner = "IT1";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone4.transform.childCount > 2 && this.tag == "IT")
                 {
-                    if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
-                        }
-
-                        stackZone4.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT1 Title").GetComponent<Text>().text = "IT Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(1).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-
-                        stackZone4.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT1 Title").GetComponent<Text>().text = "IT Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand.transform);
                 }
                 else
                 {
-                    GameObject.Find("IT1 Title").GetComponent<Text>().text = "IT Tier " + tier;
-                    if (tier == 2)
+                    owner = "IT1";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p1score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.it1);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT1 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT1 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p1score += 2;
+                        GameObject.Find("IT1 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("IT1 Title2").GetComponent<Text>().text = "IT";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p1score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p1score += 2;
+                        }
+                        PlayerDeck.player1StackCards.Add(thisCard[0]);
+                        PlayerDeck.player1Cards.Remove(thisCard[0]);
+                        PlayerDeck.it1 = gameObject.name;
                     }
-                    PlayerDeck.player1StackCards.Add(thisCard[0]);
-                    PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -1862,72 +2151,97 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer2Turn && (owner != "IT2" && owner != "Discarded1") && (this.tag == "IT" || this.tag == "Upgrade"))
             {
-                owner = "IT2";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone4.transform.childCount > 1 && this.tag == "IT")
                 {
-                    if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
-                        }
-
-                        stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT2 Title").GetComponent<Text>().text = "IT Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-
-                        stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT2 Title").GetComponent<Text>().text = "IT Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand2.transform);
                 }
                 else
                 {
-                    GameObject.Find("IT2 Title").GetComponent<Text>().text = "IT Tier " + tier;
-                    if (tier == 2)
+                    owner = "IT2";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p2score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.it2);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT2 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT2 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand2.transform);
+                        }
+
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p2score += 2;
+                        GameObject.Find("IT2 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("IT2 Title2").GetComponent<Text>().text = "IT";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p2score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p2score += 2;
+                        }
+                        PlayerDeck.player2StackCards.Add(thisCard[0]);
+                        PlayerDeck.player2Cards.Remove(thisCard[0]);
+                        PlayerDeck.it2 = gameObject.name;
                     }
-                    PlayerDeck.player2StackCards.Add(thisCard[0]);
-                    PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -1945,72 +2259,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer3Turn && (owner != "IT3" && owner != "Discarded2") && (this.tag == "IT" || this.tag == "Upgrade"))
             {
-                owner = "IT3";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone4.transform.childCount > 1 && this.tag == "IT")
                 {
-                    if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
-                        }
-
-                        stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT3 Title").GetComponent<Text>().text = "IT Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-
-                        stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT3 Title").GetComponent<Text>().text = "IT Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand3.transform);
                 }
                 else
                 {
-                    GameObject.Find("IT3 Title").GetComponent<Text>().text = "IT Tier " + tier;
-                    if (tier == 2)
+                    owner = "IT3";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p3score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.it3);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT3 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT3 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand3.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p3score += 2;
+                        GameObject.Find("IT3 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("IT3 Title2").GetComponent<Text>().text = "IT";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p3score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p3score += 2;
+                        }
+                        PlayerDeck.player3StackCards.Add(thisCard[0]);
+                        PlayerDeck.player3Cards.Remove(thisCard[0]);
+                        PlayerDeck.it3 = gameObject.name;
                     }
-                    PlayerDeck.player3StackCards.Add(thisCard[0]);
-                    PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -2028,72 +2366,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer4Turn && (owner != "IT4" && owner != "Discarded3") && (this.tag == "IT" || this.tag == "Upgrade"))
             {
-                owner = "IT4";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone4.transform.childCount > 1 && this.tag == "IT")
                 {
-                    if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
-                        }
-
-                        stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT4 Title").GetComponent<Text>().text = "IT Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 14)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 15)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 16)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-                        else if (stackZone4.transform.GetChild(0).GetComponent<ThisCard>().id == 17)
-                        {
-                            stackZone4.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
-                        }
-
-                        stackZone4.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("IT4 Title").GetComponent<Text>().text = "IT Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand4.transform);
                 }
                 else
                 {
-                    GameObject.Find("IT4 Title").GetComponent<Text>().text = "IT Tier " + tier;
-                    if (tier == 2)
+                    owner = "IT4";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p4score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.it4);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT4 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 14)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 15)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 16)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 17)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 BT");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 42)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 BT");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("IT4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("IT4 Title2").GetComponent<Text>().text = "IT";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand4.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p4score += 2;
+                        GameObject.Find("IT4 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("IT4 Title2").GetComponent<Text>().text = "IT";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p4score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p4score += 2;
+                        }
+                        PlayerDeck.player4StackCards.Add(thisCard[0]);
+                        PlayerDeck.player4Cards.Remove(thisCard[0]);
+                        PlayerDeck.it4 = gameObject.name;
                     }
-                    PlayerDeck.player4StackCards.Add(thisCard[0]);
-                    PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -2113,72 +2475,96 @@ public class ThisCard : MonoBehaviour
         {
             if (TurnSystem.isPlayer1Turn && (owner != "VC1" && owner != "Discarded4") && (this.tag == "VC" || this.tag == "Upgrade"))
             {
-                owner = "VC1";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone5.transform.childCount > 2 && this.tag == "VC")
                 {
-                    if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
-                        }
-
-                        stackZone5.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC1 Title").GetComponent<Text>().text = "VC Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
-                    else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(1).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(1).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
-                        }
-
-                        stackZone5.transform.GetChild(1).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC1 Title").GetComponent<Text>().text = "VC Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p1score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand.transform);
                 }
                 else
                 {
-                    GameObject.Find("VC1 Title").GetComponent<Text>().text = "VC Tier " + tier;
-                    if (tier == 2)
+                    owner = "VC1";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p1score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.vc1);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC1 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC1 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC1 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p1score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p1score += 2;
+                        GameObject.Find("VC1 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("VC1 Title2").GetComponent<Text>().text = "VC";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p1score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p1score += 2;
+                        }
+                        PlayerDeck.player1StackCards.Add(thisCard[0]);
+                        PlayerDeck.player1Cards.Remove(thisCard[0]);
+                        PlayerDeck.vc1 = gameObject.name;
                     }
-                    PlayerDeck.player1StackCards.Add(thisCard[0]);
-                    PlayerDeck.player1Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -2196,72 +2582,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer2Turn && (owner != "VC2" && owner != "Discarded1") && (this.tag == "VC" || this.tag == "Upgrade"))
             {
-                owner = "VC2";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone5.transform.childCount > 1 && this.tag == "VC")
                 {
-                    if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
-                        }
-
-                        stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC2 Title").GetComponent<Text>().text = "VC Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
-                    else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
-                        }
-
-                        stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC2 Title").GetComponent<Text>().text = "VC Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p2score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand2.transform);
                 }
                 else
                 {
-                    GameObject.Find("VC2 Title").GetComponent<Text>().text = "VC Tier " + tier;
-                    if (tier == 2)
+                    owner = "VC2";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p2score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.vc2);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC2 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC2 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC2 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p2score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand2.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p2score += 2;
+                        GameObject.Find("VC2 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("VC2 Title2").GetComponent<Text>().text = "VC";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p2score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p2score += 2;
+                        }
+                        PlayerDeck.player2StackCards.Add(thisCard[0]);
+                        PlayerDeck.player2Cards.Remove(thisCard[0]);
+                        PlayerDeck.vc2 = gameObject.name;
                     }
-                    PlayerDeck.player2StackCards.Add(thisCard[0]);
-                    PlayerDeck.player2Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -2280,72 +2690,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer3Turn && (owner != "VC3" && owner != "Discarded2") && (this.tag == "VC" || this.tag == "Upgrade"))
             {
-                owner = "VC3";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone5.transform.childCount > 1 && this.tag == "VC")
                 {
-                    if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
-                        }
-
-                        stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC3 Title").GetComponent<Text>().text = "VC Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
-                    else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
-                        }
-
-                        stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC3 Title").GetComponent<Text>().text = "VC Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p3score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand3.transform);
                 }
                 else
                 {
-                    GameObject.Find("VC3 Title").GetComponent<Text>().text = "VC Tier " + tier;
-                    if (tier == 2)
+                    owner = "VC3";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p3score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.vc3);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC3 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC3 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC3 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p3score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand3.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p3score += 2;
+                        GameObject.Find("VC3 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("VC3 Title2").GetComponent<Text>().text = "VC";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p3score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p3score += 2;
+                        }
+                        PlayerDeck.player3StackCards.Add(thisCard[0]);
+                        PlayerDeck.player3Cards.Remove(thisCard[0]);
+                        PlayerDeck.vc3 = gameObject.name;
                     }
-                    PlayerDeck.player3StackCards.Add(thisCard[0]);
-                    PlayerDeck.player3Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -2364,72 +2798,96 @@ public class ThisCard : MonoBehaviour
 
             if (TurnSystem.isPlayer4Turn && (owner != "VC4" && owner != "Discarded3" ) && (this.tag == "VC" || this.tag == "Upgrade"))
             {
-                owner = "VC4";
-                this.transform.SetAsLastSibling();
-                if (thisCard[0].id == 38)
+                if (stackZone5.transform.childCount > 1 && this.tag == "VC")
                 {
-                    if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier == 1)
-                    {
-                        if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
-                        }
-
-                        stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC4 Title").GetComponent<Text>().text = "VC Tier 2";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
-                    else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier == 2)
-                    {
-                        if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 5)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 6)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 7)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
-                        }
-                        else if (stackZone5.transform.GetChild(0).GetComponent<ThisCard>().id == 8)
-                        {
-                            stackZone5.transform.GetChild(0).GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
-                        }
-
-                        stackZone5.transform.GetChild(0).GetComponent<ThisCard>().tier++;
-                        GameObject.Find("VC4 Title").GetComponent<Text>().text = "VC Tier 3";
-                        Destroy(gameObject);
-                        PlayerDeck.p4score++;
-                    }
+                    Debug.Log("Count is " + stackZone.transform.childCount);
+                    this.transform.SetParent(Hand4.transform);
                 }
                 else
                 {
-                    GameObject.Find("VC4 Title").GetComponent<Text>().text = "VC Tier " + tier;
-                    if (tier == 2)
+                    owner = "VC4";
+                    this.transform.SetAsLastSibling();
+                    if (thisCard[0].id == 38)
                     {
-                        PlayerDeck.p4score += 1;
+                        GameObject card = GameObject.Find(PlayerDeck.vc4);
+                        if (card.GetComponent<ThisCard>().tier == 1)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-2 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-2 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC4 Title").GetComponent<Text>().text = card.GetComponent<ThisCard>().cardName + " Tier " + card.GetComponent<ThisCard>().tier;
+                            GameObject.Find("VC4 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else if (card.GetComponent<ThisCard>().tier == 2)
+                        {
+                            if (card.GetComponent<ThisCard>().id == 5)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("1-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 6)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("2-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 7)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("3-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 8)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("4-3 VC");
+                            }
+                            else if (card.GetComponent<ThisCard>().id == 43)
+                            {
+                                card.GetComponent<ThisCard>().thisSprite = Resources.Load<Sprite>("5-3 VC");
+                            }
+                            card.GetComponent<ThisCard>().tier++;
+                            GameObject.Find("VC4 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                            GameObject.Find("VC4 Title2").GetComponent<Text>().text = "VC";
+                            Destroy(gameObject);
+                            PlayerDeck.p4score++;
+                        }
+                        else
+                        {
+                            this.transform.SetParent(Hand4.transform);
+                        }
+
                     }
-                    else if (tier == 3)
+                    else
                     {
-                        PlayerDeck.p4score += 2;
+                        GameObject.Find("VC4 Title").GetComponent<Text>().text = cardName + " Tier " + tier;
+                        GameObject.Find("VC4 Title2").GetComponent<Text>().text = "VC";
+                        if (tier == 2)
+                        {
+                            PlayerDeck.p4score += 1;
+                        }
+                        else if (tier == 3)
+                        {
+                            PlayerDeck.p4score += 2;
+                        }
+                        PlayerDeck.player4StackCards.Add(thisCard[0]);
+                        PlayerDeck.player4Cards.Remove(thisCard[0]);
+                        PlayerDeck.vc4 = gameObject.name;
                     }
-                    PlayerDeck.player4StackCards.Add(thisCard[0]);
-                    PlayerDeck.player4Cards.Remove(thisCard[0]);
                 }
             }
 
@@ -2454,4 +2912,5 @@ public class ThisCard : MonoBehaviour
         this.transform.rotation = stackZone.transform.rotation;
         //summoned = true;
     }
+
 }

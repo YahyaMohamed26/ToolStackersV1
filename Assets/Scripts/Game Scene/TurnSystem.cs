@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class TurnSystem : MonoBehaviourPun
+public class TurnSystem : MonoBehaviourPunCallbacks
 {
     public static bool isPlayer1Turn;
     public static bool isPlayer2Turn;
@@ -20,6 +20,7 @@ public class TurnSystem : MonoBehaviourPun
     public GameObject Player4Name;
 
     public GameObject turnPanel;
+    public static GameObject turnPanels;
     public Text turnText;
 
     // Start is called before the first frame update
@@ -33,7 +34,12 @@ public class TurnSystem : MonoBehaviourPun
         turnText.text = "Your turn";
     }
 
-    public void leave()
+    public void Leave()
+    {
+        PhotonNetwork.LeaveRoom();
+    }
+
+    public override void OnLeftRoom()
     {
         SceneManager.LoadScene(0);
     }
@@ -41,6 +47,8 @@ public class TurnSystem : MonoBehaviourPun
     // Update is called once per frame
     void Update()
     {
+        turnPanels = turnPanel;
+
         if (isPlayer1Turn)
         {
             Player1Name.GetComponent<Image>().color = Color.yellow;
@@ -48,9 +56,14 @@ public class TurnSystem : MonoBehaviourPun
             Player2Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player3Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player4Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
-
-            turnPanel.SetActive(false);
-
+            if (!PlayerDeck.hasClicked2)
+            {
+                turnPanel.SetActive(false);
+            }
+            else
+            {
+                turnPanel.SetActive(true);
+            }
         }
         else if (isPlayer2Turn)
         {
@@ -78,7 +91,11 @@ public class TurnSystem : MonoBehaviourPun
             Player3Name.GetComponent<Image>().color = new Color32(193, 224, 231, 255);
             Player4Name.GetComponent<Image>().color = Color.yellow;
             turnPanel.SetActive(true);
-        }   
+        }
+        else
+        {
+            turnPanel.SetActive(true);
+        }
     }
 
     public void EndTurn()
@@ -90,6 +107,17 @@ public class TurnSystem : MonoBehaviourPun
     [PunRPC]
     public void RpcEndTurn()
     {
+        PlayerPhoton mainPlayer = null;
+        foreach (PlayerPhoton player in FindObjectsOfType<PlayerPhoton>())
+        {
+            if (player.photonView.IsMine)
+            {
+                mainPlayer = player;
+                break;
+            }
+        }
+        mainPlayer.callSync();
+
         if (isPlayer1Turn)
         {
             if (PhotonNetwork.CurrentRoom.PlayerCount >= 2)
@@ -99,18 +127,14 @@ public class TurnSystem : MonoBehaviourPun
             }
             PlayerDeck.hasDrewCard = false;
             PlayerDeck.hasDiscardedCard = false;
+            PlayerDeck.hasDiscardedCard2 = false;
             DrawButton.GetComponent<Button>().interactable = true;
             DrawEventButton.GetComponent<Button>().interactable = true;
             Player1Name.GetComponent<Image>().color = Color.black;
             if (PlayerDeck.eventCard != null && PlayerDeck.eventCard.tag != "Upgrade")
             {
                 Destroy(PlayerDeck.eventCard);
-                PlayerDeck.eventDeckSize++;
-                int x = Random.Range(0, PlayerDeck.eventDeckSize);
-                Card temp = PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1];
-                PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1] = PlayerDeck.staticEventDeck[x];
-                PlayerDeck.staticEventDeck[x] = temp;
-                ThisCard.numberOfCardsInEventDeck++;
+                PlayerDeck.staticEventDeck.Insert(0, PlayerDeck.eventCardPlayed);
             }
             GameObject discarded = GameObject.Find("Discarded Player 4");
             if (discarded.transform.childCount > 0)
@@ -131,18 +155,14 @@ public class TurnSystem : MonoBehaviourPun
             }
             PlayerDeck.hasDrewCard = false;
             PlayerDeck.hasDiscardedCard = false;
+            PlayerDeck.hasDiscardedCard2 = false;
             DrawButton.GetComponent<Button>().interactable = true;
             DrawEventButton.GetComponent<Button>().interactable = true;
             Player2Name.GetComponent<Image>().color = Color.black;
             if (PlayerDeck.eventCard != null && PlayerDeck.eventCard.tag != "Upgrade")
             {
                 Destroy(PlayerDeck.eventCard);
-                PlayerDeck.eventDeckSize++;
-                int x = Random.Range(0, PlayerDeck.eventDeckSize);
-                Card temp = PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1];
-                PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1] = PlayerDeck.staticEventDeck[x];
-                PlayerDeck.staticEventDeck[x] = temp;
-                ThisCard.numberOfCardsInEventDeck++;
+                PlayerDeck.staticEventDeck.Insert(0, PlayerDeck.eventCardPlayed);
             }
             GameObject discarded = GameObject.Find("Discarded Player 1");
             if (discarded.transform.childCount > 0)
@@ -163,18 +183,14 @@ public class TurnSystem : MonoBehaviourPun
             }
             PlayerDeck.hasDrewCard = false;
             PlayerDeck.hasDiscardedCard = false;
+            PlayerDeck.hasDiscardedCard2 = false;
             DrawButton.GetComponent<Button>().interactable = true;
             DrawEventButton.GetComponent<Button>().interactable = true;
             Player3Name.GetComponent<Image>().color = Color.black;
             if (PlayerDeck.eventCard != null && PlayerDeck.eventCard.tag != "Upgrade")
             {
                 Destroy(PlayerDeck.eventCard);
-                PlayerDeck.eventDeckSize++;
-                int x = Random.Range(0, PlayerDeck.eventDeckSize);
-                Card temp = PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1];
-                PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1] = PlayerDeck.staticEventDeck[x];
-                PlayerDeck.staticEventDeck[x] = temp;
-                ThisCard.numberOfCardsInEventDeck++;
+                PlayerDeck.staticEventDeck.Insert(0, PlayerDeck.eventCardPlayed);
             }
             GameObject discarded = GameObject.Find("Discarded Player 2");
             if (discarded.transform.childCount > 0)
@@ -188,18 +204,14 @@ public class TurnSystem : MonoBehaviourPun
             isPlayer1Turn = true;
             PlayerDeck.hasDrewCard = false;
             PlayerDeck.hasDiscardedCard = false;
+            PlayerDeck.hasDiscardedCard2 = false;
             DrawButton.GetComponent<Button>().interactable = true;
             DrawEventButton.GetComponent<Button>().interactable = true;
             Player4Name.GetComponent<Image>().color = Color.black;
             if (PlayerDeck.eventCard != null && PlayerDeck.eventCard.tag != "Upgrade")
             {
                 Destroy(PlayerDeck.eventCard);
-                PlayerDeck.eventDeckSize++;
-                int x = Random.Range(0, PlayerDeck.eventDeckSize);
-                Card temp = PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1];
-                PlayerDeck.staticEventDeck[PlayerDeck.eventDeckSize - 1] = PlayerDeck.staticEventDeck[x];
-                PlayerDeck.staticEventDeck[x] = temp;
-                ThisCard.numberOfCardsInEventDeck++;
+                PlayerDeck.staticEventDeck.Insert(0, PlayerDeck.eventCardPlayed);  
             }
             GameObject discarded = GameObject.Find("Discarded Player 3");
             if (discarded.transform.childCount > 0)
